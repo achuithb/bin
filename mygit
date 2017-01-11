@@ -1,0 +1,72 @@
+#!/usr/bin/python
+
+import os
+import subprocess
+import sys
+
+
+HOME = os.environ['HOME']
+CHROME_DIR = os.path.join(HOME, 'code/chrome/src')
+CROS_DIR = os.path.join(HOME, 'code/cros')
+CATAPULT_DIR = os.path.join(HOME, 'code/catapult')
+
+dry_run = False
+
+
+def Call(args):
+  print args
+  if not dry_run:
+    subprocess.call(args.split(' '))
+
+
+def CheckDir(path):
+  return os.getcwd().startswith(path)
+
+
+def GitSetUpstream(branch):
+  Call('git branch --set-upstream-to=%s' % branch)
+
+
+def GitCommitFixup():
+  Call('git commit -a --fixup=HEAD')
+
+
+def GitAutoSquash():
+  Call('git rebase -i --autosquash')
+
+
+def GitUpload():
+  Call('git cl upload')
+
+
+def RepoUpload():
+  Call('repo upload .')
+
+def Update():
+  if not CheckDir(CROS_DIR):
+    GitSetUpstream('master')
+  GitCommitFixup()
+  GitAutoSquash()
+
+
+def Upload():
+  if CheckDir(CROS_DIR):
+    RepoUpload()
+  else:
+    GitSetUpstream('origin/master')
+    GitUpload()
+    GitSetUpstream('master')
+
+
+def Usage(argv):
+  print 'Usage: %s [upload|update]' % argv[0].split('/')[-1]
+  sys.exit(1)
+
+def main(argv):
+  func_map = { 'upload': Upload, 'update': Update }
+  if len(argv) != 2 or argv[1] not in func_map.keys():
+    Usage(argv)
+  func_map[argv[1]]()
+
+if __name__ == '__main__':
+  sys.exit(main(sys.argv))
