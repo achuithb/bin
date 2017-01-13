@@ -130,7 +130,7 @@ export P4EDITOR=$EDITOR
 umask 022
 
 # Build customizations - depot_tools, goma, gold.
-PATH=$HOME/code/bin/:$HOME/code/depot_tools:$HOME/code/goma:/usr/local/gold/bin:$PATH
+PATH=$HOME/code/bin:$HOME/code/depot_tools:$HOME/code/goma:/usr/local/gold/bin:$PATH
 
 # for Eclipse
 export profile=final
