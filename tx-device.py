@@ -74,8 +74,8 @@ def Scp(paths, port):
 
 def TarDir(dirname):
   tar_file = dirname + '.tar'
-  tar_cmd = ['tar', 'cvf', tar_file,
-             '--exclude=\.pyc', '--exclude=\.svn', '--exclude=\.git',
+  tar_cmd = ['tar', 'cvzf', tar_file,
+             '--exclude="\*\.pyc"', '--exclude=\*\.svn', '--exclude=\*\.git',
              dirname]
   RunCmd(tar_cmd)
   return tar_file
@@ -88,7 +88,7 @@ def UnTar(host, port, dest_path, strip):
   untar_cmd = (
       'cd %s; '
       'rm -rf %s; '
-      'tar xvf %s --strip-components %d; '
+      'tar xvzf %s --strip-components %d; '
       'rm -f %s; '
       'chown -R chronos:chronos %s'
       % (cwd, tar_dir, tar_file, strip, tar_file, tar_dir))
