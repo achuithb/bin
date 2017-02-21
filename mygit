@@ -40,7 +40,7 @@ def GitUpload():
 
 
 def RepoUpload():
-  Call('repo upload . --verify')
+  Call('repo upload . --verify --cbr')
 
 def Update():
   if not CheckDir(CROS_DIR):
