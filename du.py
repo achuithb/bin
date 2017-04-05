@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, subprocess
+import os, sys, subprocess
 
 
 def CheckOutput(args):
@@ -15,23 +15,29 @@ def DiskUsage(d):
   return CheckOutput('sudo du -hs %s' % d).rstrip().split()
 
 
+def SortFunc(a):
+  val = a[0]
+  m = val[-1]
+  n = val[0:len(val)-1]
+  n = float(n) if n else 0  # Handle empty string.
+  if m == 'K': n *= 1024
+  if m == 'M': n *= 1024 * 1024
+  if m == 'G': n *= 1024 * 1024 * 1024
+  return n
+
 def PrintTotalUsage(cols):
-  def SortFunc(a):
-    val = a[0]
-    m = val[-1]
-    n = float(val[0:len(val)-1])
-    if m == 'K': n *= 1024
-    if m == 'M': n *= 1024 * 1024
-    if m == 'G': n *= 1024 * 1024 * 1024
-    return n
   for row in sorted(cols, reverse=True, key=SortFunc):
+    if row[0].find('G') == -1:
+      break;  # Skip anything less than a gig.
     PrintUsage(row)
 
 
 def TotalUsage(dirs):
   cols = []
   for d in dirs:
-    cols.append(DiskUsage(d))
+    # Skip non-directories.
+    if os.path.isdir(d):
+      cols.append(DiskUsage(d))
   return cols
 
 
