@@ -2,49 +2,55 @@
 
 import os, sys, subprocess
 
+MIN_SIZE = 10  # Skip anything less than 10G.
+MAX_DEPTH = 7
+HOME = '/usr/local/google/home/achuith'
 
 def CheckOutput(args):
-  return subprocess.check_output(args.split(' '))
+  #print args
+  return subprocess.check_output(args).rstrip()
 
-
-def PrintUsage(ary):
-  print "".join(word.ljust(20) for word in reversed(ary))
-
+def PrintUsageForDir(ary):
+  print '%s: %dG' % (ary[1], ary[0])
 
 def DiskUsage(d):
-  return CheckOutput('sudo du -hs %s' % d).rstrip().split()
-
-
-def SortFunc(a):
-  val = a[0]
-  m = val[-1]
-  n = val[0:len(val)-1]
-  n = float(n) if n else 0  # Handle empty string.
-  if m == 'K': n *= 1024
-  if m == 'M': n *= 1024 * 1024
-  if m == 'G': n *= 1024 * 1024 * 1024
-  return n
+  ary = subprocess.check_output(['sudo', 'du', '-s', d]).rstrip().split()
+  ary[0] = int(ary[0])
+  #print ary
+  return ary  # (numblocks, name)
 
 def PrintTotalUsage(cols):
-  for row in sorted(cols, reverse=True, key=SortFunc):
-    if row[0].find('G') == -1:
-      break;  # Skip anything less than a gig.
-    PrintUsage(row)
+  for row in sorted(cols, reverse=True, key=lambda a: a[0]):
+    row[0] = row[0]/(1024 * 1024)
+    if row[0] < MIN_SIZE:
+      break;
+    PrintUsageForDir(row)
+    Recurse(row[1])
 
+def Recurse(root):
+  if root.count('/') >= MAX_DEPTH:
+    return
+  dirs = os.listdir(root)
+  for i in range(len(dirs)):
+    dirs[i] = os.path.join(root, dirs[i])
+  #print dirs
+  UsageForDirs(dirs)
 
-def TotalUsage(dirs):
+def UsageForDirs(dirs):
   cols = []
   for d in dirs:
     # Skip non-directories.
     if os.path.isdir(d):
       cols.append(DiskUsage(d))
-  return cols
+  PrintTotalUsage(cols)
 
 
 def main(argv):
-  cols = TotalUsage(argv[1:])
-  PrintTotalUsage(cols)
-
+  dirs = argv[1:]
+  if not dirs:
+    os.chdir(HOME)
+    dirs = ['code']
+  UsageForDirs(dirs)
 
 if __name__ == '__main__':
   sys.exit(main(sys.argv))
