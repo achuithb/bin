@@ -2,6 +2,7 @@
 
 import os, sys, subprocess
 
+#TODO(achuith): Use argparse for these.
 MIN_SIZE = 10  # Skip anything less than 10G.
 MAX_DEPTH = 7
 HOME = '/usr/local/google/home/achuith'
