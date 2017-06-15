@@ -7,18 +7,17 @@ import sys
 # Run this script from ~/code/chrome/src/third_party/chromite/
 # on master branch.
 
-VM_BRANCH = 'vm_test'
 BASE_DIR = '/usr/local/google/home/achuith/code/'
 CROS_DIR = os.path.join(BASE_DIR, 'cros/chromite')
 CHROME_DIR = os.path.join(BASE_DIR, 'chrome/src/third_party/chromite')
 FILES = [
-    'bin/cros_run_vm_test',
-    'bin/cros_vm',
     'scripts/cros_run_vm_test.py',
     'scripts/cros_vm.py',
-    'cbuildbot/constants.py',
-    'cli/cros/cros_chrome_sdk.py',
 ]
+
+def DetachedHead():
+  return subprocess.check_output(
+    ['git', 'status', '-sb']).rstrip() == '## HEAD (no branch)'
 
 
 def GitBranch():
@@ -55,12 +54,13 @@ def CreateLink(filename):
 
 
 def main(argv):
-  if os.getcwd() != CHROME_DIR:
-    raise Exception('not at %s' % CHROME_DIR)
-  if GitBranch() != 'master':
-    raise Exception('not on master')
+  if os.path.commonprefix([CHROME_DIR, os.getcwd()]) != CHROME_DIR:
+    raise Exception('Not at %s' % CHROME_DIR)
+  if not DetachedHead():
+    raise Exception('Not in detached head state.')
 
-  CreateGitBranch(VM_BRANCH)
+  CreateGitBranch('master')
+  CreateGitBranch('vm_test')
   for filename in FILES:
     CreateLink(filename)
   GitCommit()
