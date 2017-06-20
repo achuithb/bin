@@ -10,6 +10,8 @@ import sys
 BASE_DIR = '/usr/local/google/home/achuith/code/'
 CROS_DIR = os.path.join(BASE_DIR, 'cros/chromite')
 CHROME_DIR = os.path.join(BASE_DIR, 'chrome/src/third_party/chromite')
+MASTER_BRANCH = 'master'
+VM_TEST_BRANCH = 'vm_test'
 FILES = [
     'scripts/cros_run_vm_test.py',
     'scripts/cros_vm.py',
@@ -25,8 +27,16 @@ def GitBranch():
     ['git', 'symbolic-ref', '--short', 'HEAD']).rstrip()
 
 
-def CreateGitBranch(new_branch):
+def GitCreateBranch(new_branch):
   subprocess.call(['git', 'checkout', '-b', new_branch])
+
+
+def GitDeleteBranch(branch):
+  subprocess.call(['git', 'branch', '-D', branch])
+
+
+def GitCheckoutHEAD():
+  subprocess.call(['git', 'checkout', 'HEAD~'])
 
 
 def GitAddFile(filename):
@@ -52,18 +62,38 @@ def CreateLink(filename):
   os.symlink(source, link)
   GitAddFile(link)
 
+def Create():
+  if not DetachedHead():
+    raise Exception('Not in detached head state.')
+
+  GitCreateBranch(MASTER_BRANCH)
+  GitCreateBranch(VM_TEST_BRANCH)
+  for filename in FILES:
+    CreateLink(filename)
+  GitCommit()
+
+def Delete():
+  if GitBranch() != VM_TEST_BRANCH:
+    raise Exception('Not in expected branch %s.' % VM_TEST_BRANCH)
+
+  GitCheckoutHEAD()
+  GitDeleteBranch(MASTER_BRANCH)
+  GitDeleteBranch(VM_TEST_BRANCH)
+
+
+def Usage(argv):
+  print 'Usage: %s [create|delete]' % argv[0].split('/')[-1]
+  sys.exit(1)
+
 
 def main(argv):
   if os.path.commonprefix([CHROME_DIR, os.getcwd()]) != CHROME_DIR:
     raise Exception('Not at %s' % CHROME_DIR)
-  if not DetachedHead():
-    raise Exception('Not in detached head state.')
 
-  CreateGitBranch('master')
-  CreateGitBranch('vm_test')
-  for filename in FILES:
-    CreateLink(filename)
-  GitCommit()
+  func_map = { 'create': Create, 'delete': Delete }
+  if len(argv) != 2 or argv[1] not in func_map.keys():
+    Usage(argv)
+  func_map[argv[1]]()
 
 
 if __name__ == '__main__':
