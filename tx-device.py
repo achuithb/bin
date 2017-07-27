@@ -5,7 +5,7 @@ import subprocess
 import sys
 import os
 
-DEVICE_IP='100.96.48.27'
+DEVICE_IP='100.96.59.85'
 ALT_DEVICE_IP='100.96.56.235'
 VM_IP='localhost'
 VM_PORT='9222'
