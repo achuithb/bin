@@ -5,7 +5,7 @@ import subprocess
 import sys
 import os
 
-DEVICE_IP='100.96.59.85'
+DEVICE_IP='100.98.114.209'
 ALT_DEVICE_IP='100.96.56.235'
 VM_IP='localhost'
 VM_PORT='9222'
@@ -72,7 +72,13 @@ def Scp(paths, port):
   RunCmd(scp)
 
 
+def CleanupPyc(dirname):
+  RunCmd(['find', dirname, '-name', '*.pyc', '-delete'])
+
+
 def TarDir(dirname):
+  CleanupPyc(dirname)
+
   tar_file = dirname + '.tar'
   tar_cmd = ['tar', 'cvzf', tar_file,
              '--exclude="\*\.pyc"', '--exclude=\*\.svn', '--exclude=\*\.git',
@@ -109,15 +115,15 @@ def DestPath(src_path):
   return "%s%s" % (match['dest_prefix'], rel_path)
 
 
-def TransferFile(file, host, port, reverse):
-  src_path = os.path.abspath(file)
+def TransferFile(filename, host, port, reverse):
+  src_path = os.path.abspath(filename)
   if not os.path.exists(src_path) and not reverse:
-    raise Exception('File does not exist %s' % file)
+    raise Exception('File does not exist %s' % filename)
 
   tarred = False
   if os.path.isdir(src_path):
     if reverse:
-      raise Exception('Cannot fetch a remote directory %s' % file)
+      raise Exception('Cannot fetch a remote directory %s' % filename)
     tarred = True
     src_path = TarDir(src_path)
 
@@ -161,8 +167,8 @@ def TransferFiles(args):
 
   host = GetHostFromArgs(args)
   port = GetPortFromArgs(args)
-  for file in args.files:
-    TransferFile(file, host, port, args.reverse)
+  for filename in args.files:
+    TransferFile(filename, host, port, args.reverse)
 
 
 def Parse():
