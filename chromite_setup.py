@@ -11,10 +11,11 @@ BASE_DIR = '/usr/local/google/home/achuith/code/'
 CROS_DIR = os.path.join(BASE_DIR, 'cros/chromite')
 CHROME_DIR = os.path.join(BASE_DIR, 'chrome/src/third_party/chromite')
 MASTER_BRANCH = 'master'
-VM_TEST_BRANCH = 'vm_test'
+VM_TEST_BRANCH = 'chromite'
 FILES = [
     'scripts/cros_run_vm_test.py',
     'scripts/cros_vm.py',
+    'cli/cros/cros_chrome_sdk.py',
 ]
 
 def DetachedHead():
@@ -44,7 +45,7 @@ def GitAddFile(filename):
 
 
 def GitCommit():
-  subprocess.call(['git', 'commit', '-a', '-m', 'vm_test debugging'])
+  subprocess.call(['git', 'commit', '-a', '-m', 'chromite debugging'])
 
 
 def RemoveFile(filename):
