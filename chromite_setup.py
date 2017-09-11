@@ -4,6 +4,8 @@ import os
 import subprocess
 import sys
 
+import git_lib
+
 # Run this script from ~/code/chrome/src/third_party/chromite/
 # on master branch.
 
@@ -17,35 +19,6 @@ FILES = [
     'scripts/cros_vm.py',
     'cli/cros/cros_chrome_sdk.py',
 ]
-
-def DetachedHead():
-  return subprocess.check_output(
-    ['git', 'status', '-sb']).rstrip() == '## HEAD (no branch)'
-
-
-def GitBranch():
-  return subprocess.check_output(
-    ['git', 'symbolic-ref', '--short', 'HEAD']).rstrip()
-
-
-def GitCreateBranch(new_branch):
-  subprocess.call(['git', 'checkout', '-b', new_branch])
-
-
-def GitDeleteBranch(branch):
-  subprocess.call(['git', 'branch', '-D', branch])
-
-
-def GitCheckoutHEAD():
-  subprocess.call(['git', 'checkout', 'HEAD~'])
-
-
-def GitAddFile(filename):
-  subprocess.call(['git', 'add', filename])
-
-
-def GitCommit():
-  subprocess.call(['git', 'commit', '-a', '-m', 'chromite debugging'])
 
 
 def RemoveFile(filename):
@@ -61,25 +34,21 @@ def CreateLink(filename):
   link = os.path.join(CHROME_DIR, filename)
   RemoveFile(link)
   os.symlink(source, link)
-  GitAddFile(link)
+  git_lib.GitAddFile(link)
 
 def Create():
-  if not DetachedHead():
-    raise Exception('Not in detached head state.')
-
-  GitCreateBranch(MASTER_BRANCH)
-  GitCreateBranch(VM_TEST_BRANCH)
+  git_lib.AssertDetachedHead()
+  git_lib.GitCreateBranch(MASTER_BRANCH)
+  git_lib.GitCreateBranch(VM_TEST_BRANCH)
   for filename in FILES:
     CreateLink(filename)
-  GitCommit()
+  git_lib.GitCommit()
 
 def Delete():
-  if GitBranch() != VM_TEST_BRANCH:
-    raise Exception('Not in expected branch %s.' % VM_TEST_BRANCH)
-
-  GitCheckoutHEAD()
-  GitDeleteBranch(MASTER_BRANCH)
-  GitDeleteBranch(VM_TEST_BRANCH)
+  git_lib.AssertOnBranch(VM_TEST_BRANCH)
+  git_lib.GitCheckoutHEAD()
+  git_lib.GitDeleteBranch(MASTER_BRANCH)
+  git_lib.GitDeleteBranch(VM_TEST_BRANCH)
 
 
 def Usage(argv):
@@ -88,8 +57,7 @@ def Usage(argv):
 
 
 def main(argv):
-  if os.path.commonprefix([CHROME_DIR, os.getcwd()]) != CHROME_DIR:
-    raise Exception('Not at %s' % CHROME_DIR)
+  git_lib.AssertCWD(CHROME_DIR)
 
   func_map = { 'create': Create, 'delete': Delete }
   if len(argv) != 2 or argv[1] not in func_map.keys():
