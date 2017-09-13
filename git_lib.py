@@ -45,16 +45,8 @@ def GitRebaseMaster(branch):
     return
 
   print 'git rebase master %s' % branch
-  return
+  # This throws when rebase fails - handle this better.
   print subprocess.check_output(['git', 'rebase', 'master', branch])
-
-
-def GitRebaseAll():
-  AssertCWD()
-  AssertOnBranch()
-  for branch in GitListBranches():
-    GitRebaseMaster(branch)
-  GitCheckoutMaster()
 
 
 def GitCreateBranch(new_branch):
@@ -75,4 +67,13 @@ def GitAddFile(filename):
 
 def GitCommit():
   print subprocess.call(['git', 'commit', '-a', '-m', 'chromite debugging'])
+
+
+def GitRebaseAll(skip_list = []):
+  AssertCWD()
+  AssertOnBranch()
+  for branch in GitListBranches():
+    if branch not in skip_list:
+      GitRebaseMaster(branch)
+  GitCheckoutMaster()
 
