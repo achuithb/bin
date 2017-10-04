@@ -39,19 +39,21 @@ def GitUpload():
   Call('git cl upload')
 
 
-def RepoUpload():
-  Call('repo upload . --verify --cbr')
+def RepoUpload(args):
+  cmd = 'repo upload . --cbr '
+  cmd += args[0] if args and args[0] == '--no-verify' else '--verify'
+  Call(cmd)
 
-def Update():
+def Update(args):
   if not CheckDir(CROS_DIR):
     GitSetUpstream('master')
   GitCommitFixup()
   GitAutoSquash()
 
 
-def Upload():
+def Upload(args):
   if CheckDir(CROS_DIR):
-    RepoUpload()
+    RepoUpload(args)
   else:
     GitSetUpstream('origin/master')
     GitUpload()
@@ -64,9 +66,9 @@ def Usage(argv):
 
 def main(argv):
   func_map = { 'upload': Upload, 'update': Update }
-  if len(argv) != 2 or argv[1] not in func_map.keys():
+  if argv[1] not in func_map.keys():
     Usage(argv)
-  func_map[argv[1]]()
+  func_map[argv[1]](argv[2:])
 
 if __name__ == '__main__':
   sys.exit(main(sys.argv))
