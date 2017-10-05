@@ -4,6 +4,7 @@ import os
 import subprocess
 
 CHROME_DIR = '/usr/local/google/home/achuith/code/chrome/src'
+CATAPULT_DIR = '/usr/local/google/home/achuith/code/catapult'
 MASTER_BRANCH = 'master'
 
 
@@ -30,9 +31,16 @@ def AssertOnBranch(branch=MASTER_BRANCH):
     raise Exception('Not in expected branch %s.' % branch)
 
 
-def AssertCWD(path=CHROME_DIR):
-  if os.path.commonprefix([path, os.getcwd()]) != path:
-    raise Exception('Not at expected path %s' % path)
+def AssertCWD(paths):
+  if isinstance(paths, str):
+    paths = [paths]
+  if not isinstance(paths, list):
+    raise Exception('%s should be an array of paths' % paths)
+
+  for path in paths:
+    if os.path.commonprefix([path, os.getcwd()]) == path:
+      return
+  raise Exception('Not at expected path(s) %r' % paths)
 
 
 def AssertDetachedHead():
@@ -70,7 +78,7 @@ def GitCommit():
 
 
 def GitRebaseAll(skip_list = []):
-  AssertCWD()
+  AssertCWD([CHROME_DIR, CATAPULT_DIR])
   AssertOnBranch()
   for branch in GitListBranches():
     if branch not in skip_list:
