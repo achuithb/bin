@@ -77,6 +77,12 @@ def GitCommit():
   print subprocess.call(['git', 'commit', '-a', '-m', 'chromite debugging'])
 
 
+def GitPull():
+  AssertCWD([CHROME_DIR, CATAPULT_DIR])
+  AssertOnBranch()
+  subprocess.call(['git', 'pull'])
+
+
 def GitRebaseAll(skip_list = []):
   AssertCWD([CHROME_DIR, CATAPULT_DIR])
   AssertOnBranch()
