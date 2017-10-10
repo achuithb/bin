@@ -7,23 +7,32 @@ CHROME_DIR = '/usr/local/google/home/achuith/code/chrome/src'
 CATAPULT_DIR = '/usr/local/google/home/achuith/code/catapult'
 MASTER_BRANCH = 'master'
 
+def RunCmd(args):
+  if isinstance(args, str):
+    args = args.split()
+  if not isinstance(args, list):
+    raise Exception('RunCmd: malformed cmd %r' % args)
+
+  print 'RunCmd: %s' % (' ').join(args)
+  ret = subprocess.check_output(args)
+  print 'RunCmd response:\n%s' % ret
+  return ret
+
 
 def GitBranch():
-  return subprocess.check_output(
-    ['git', 'symbolic-ref', '--short', 'HEAD']).rstrip()
+  return RunCmd('git symbolic-ref --short HEAD').rstrip()
 
 
 def GitListBranches():
-  return subprocess.check_output(['git', 'branch',
-                                  '--format=%(refname:short)']).rstrip().split()
+  return RunCmd('git branch --format=%(refname:short)').rstrip().split()
+
 
 def GitCheckoutMaster():
-  subprocess.call(['git', 'checkout', MASTER_BRANCH])
+  RunCmd('git checkout %s' % MASTER_BRANCH)
 
 
 def DetachedHead():
-  return subprocess.check_output(
-    ['git', 'status', '-sb']).rstrip() == '## HEAD (no branch)'
+  return (RunCmd('git status -sb').rstrip() == '## HEAD (no branch)')
 
 
 def AssertOnBranch(branch=MASTER_BRANCH):
@@ -52,35 +61,34 @@ def GitRebaseMaster(branch):
   if branch == MASTER_BRANCH:
     return
 
-  print 'git rebase master %s' % branch
   # This throws when rebase fails - handle this better.
-  print subprocess.check_output(['git', 'rebase', 'master', branch])
+  RunCmd('git rebase master %s' % branch)
 
 
 def GitCreateBranch(new_branch):
-  subprocess.call(['git', 'checkout', '-b', new_branch])
+  RunCmd('git checkout -b %s' % new_branch)
 
 
 def GitDeleteBranch(branch):
-  subprocess.call(['git', 'branch', '-D', branch])
+  RunCmd('git branch -D %s' % branch)
 
 
 def GitCheckoutHEAD():
-  subprocess.call(['git', 'checkout', 'HEAD~'])
+  RunCmd('git checkout HEAD~')
 
 
 def GitAddFile(filename):
-  subprocess.call(['git', 'add', filename])
+  RunCmd('git add %s' % filename)
 
 
-def GitCommit():
-  print subprocess.call(['git', 'commit', '-a', '-m', 'chromite debugging'])
+def GitCommit(commit_message):
+  RunCmd(['git', 'commit', '-a', '-m', commit_message])
 
 
 def GitPull():
   AssertCWD([CHROME_DIR, CATAPULT_DIR])
   AssertOnBranch()
-  subprocess.call(['git', 'pull'])
+  RunCmd('git pull')
 
 
 def GitRebaseAll(skip_list = []):

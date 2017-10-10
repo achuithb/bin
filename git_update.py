@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os, subprocess, sys
+import os, sys
 
 import git_lib
 
@@ -21,7 +21,7 @@ def Sync(path):
   if (path != git_lib.CHROME_DIR):
     return
   os.chdir(os.path.dirname(git_lib.CHROME_DIR))
-  subprocess.call(['gclient', 'sync', '-j16'])
+  git_lib.RunCmd('gclient sync -j16')
 
 
 def All(path):

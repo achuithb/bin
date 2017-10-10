@@ -42,7 +42,7 @@ def Create():
   git_lib.GitCreateBranch(VM_TEST_BRANCH)
   for filename in FILES:
     CreateLink(filename)
-  git_lib.GitCommit()
+  git_lib.GitCommit('Chromite debugging')
 
 def Delete():
   git_lib.AssertOnBranch(VM_TEST_BRANCH)
