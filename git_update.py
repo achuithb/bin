@@ -39,7 +39,8 @@ def main(argv):
       argv[2] not in func_map.keys()):
     func_str = '|'.join(func_map.keys())
     repo_str = '|'.join(repo_map.keys())
-    print "Usage: %s [%s] [%s]" % (argv[0], repo_str, func_str)
+    print "Usage: %s [%s] [%s]" % (os.path.basename(argv[0]),
+                                   repo_str, func_str)
     sys.exit(1)
 
   path = repo_map[argv[1]]
