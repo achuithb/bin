@@ -47,6 +47,7 @@ def AssertCWD(paths):
     raise Exception('%s should be an array of paths' % paths)
 
   for path in paths:
+    path = os.path.realpath(path)
     if os.path.commonprefix([path, os.getcwd()]) == path:
       return
   raise Exception('Not at expected path(s) %r' % paths)
