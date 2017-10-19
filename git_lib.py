@@ -3,19 +3,35 @@
 import os
 import subprocess
 
-CHROME_DIR = '/usr/local/google/home/achuith/code/chrome/src'
-CATAPULT_DIR = '/usr/local/google/home/achuith/code/catapult'
+dry_run = False
+
+def AbsPath(path):
+  return os.path.realpath(os.path.join(os.environ['HOME'], path))
+
+CROS_DIR = AbsPath('code/cros')
+CHROME_DIR = AbsPath('code/chrome/src')
+CATAPULT_DIR = AbsPath('code/catapult')
 MASTER_BRANCH = 'master'
 
-def RunCmd(args):
+
+def IsCrOS():
+  return os.getcwd().startswith(CROS_DIR)
+
+
+def RunCmd(args, call=False):
   if isinstance(args, str):
     args = args.split()
   if not isinstance(args, list):
     raise Exception('RunCmd: malformed cmd %r' % args)
 
   print 'RunCmd: %s' % (' ').join(args)
-  ret = subprocess.check_output(args)
-  print 'RunCmd response:\n%s' % ret
+  if dry_run:
+    return 0
+  if call:
+    ret = subprocess.call(args)
+  else:
+    ret = subprocess.check_output(args)
+    print 'RunCmd response:\n%s' % ret
   return ret
 
 
@@ -58,6 +74,10 @@ def AssertDetachedHead():
     raise Exception('Not in detached head state.')
 
 
+def GitSetUpstream(branch):
+  RunCmd('git branch --set-upstream-to=%s' % branch)
+
+
 def GitRebaseMaster(branch):
   if branch == MASTER_BRANCH:
     return
@@ -82,8 +102,36 @@ def GitAddFile(filename):
   RunCmd('git add %s' % filename)
 
 
-def GitCommit(commit_message):
+def GitCommit():
+  RunCmd(['git', 'commit', '-a'], call=True)
+
+
+def GitCommitWithMessage(commit_message):
   RunCmd(['git', 'commit', '-a', '-m', commit_message])
+
+
+def GitCommitFixup():
+  RunCmd('git commit -a --fixup=HEAD')
+
+
+def GitAutoSquash():
+  RunCmd('git rebase -i --autosquash', call=True)
+
+
+def GitUpload():
+  RunCmd('git cl upload', call=True)
+
+
+def GitDiff():
+  return RunCmd('git diff')
+
+
+def GitIsAhead():
+  return RunCmd('git status -sb').find('ahead') != -1
+
+
+def GitNoCommit():
+  return RunCmd('git log --oneline --decorate -1').find('origin/master') != -1
 
 
 def GitPull():

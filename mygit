@@ -4,71 +4,49 @@ import os
 import subprocess
 import sys
 
-
-HOME = os.environ['HOME']
-CHROME_DIR = os.path.join(HOME, 'code/chrome/src')
-CROS_DIR = os.path.join(HOME, 'code/cros')
-CATAPULT_DIR = os.path.join(HOME, 'code/catapult')
-
-dry_run = False
-
-
-def Call(args):
-  print args
-  if not dry_run:
-    subprocess.call(args.split(' '))
-
-
-def CheckDir(path):
-  return os.getcwd().startswith(path)
-
-
-def GitSetUpstream(branch):
-  Call('git branch --set-upstream-to=%s' % branch)
-
-
-def GitCommitFixup():
-  Call('git commit -a --fixup=HEAD')
-
-
-def GitAutoSquash():
-  Call('git rebase -i --autosquash')
-
-
-def GitUpload():
-  Call('git cl upload')
-
+import git_lib
 
 def RepoUpload(args):
   cmd = 'repo upload . --cbr '
   cmd += args[0] if args and args[0] == '--no-verify' else '--verify'
-  Call(cmd)
+  git_lib.RunCmd(cmd, call=True)
+
 
 def Update(args):
-  if not CheckDir(CROS_DIR):
-    GitSetUpstream('master')
-  GitCommitFixup()
-  GitAutoSquash()
+  if not git_lib.GitDiff():
+    print 'Diff empty, nothing to update'
+    return
+
+  if not git_lib.IsCrOS() and git_lib.GitNoCommit():
+    git_lib.GitCommit()
+    return
+
+  if not git_lib.IsCrOS():
+    git_lib.GitSetUpstream('master')
+  git_lib.GitCommitFixup()
+  git_lib.GitAutoSquash()
 
 
 def Upload(args):
-  if CheckDir(CROS_DIR):
+  if git_lib.IsCrOS():
     RepoUpload(args)
   else:
-    GitSetUpstream('origin/master')
-    GitUpload()
-    GitSetUpstream('master')
+    git_lib.GitSetUpstream('origin/master')
+    git_lib.GitUpload()
+    git_lib.GitSetUpstream('master')
 
 
 def Usage(argv):
   print 'Usage: %s [upload|update]' % argv[0].split('/')[-1]
-  sys.exit(1)
+
 
 def main(argv):
   func_map = { 'upload': Upload, 'update': Update }
   if argv[1] not in func_map.keys():
     Usage(argv)
-  func_map[argv[1]](argv[2:])
+  else:
+    func_map[argv[1]](argv[2:])
+
 
 if __name__ == '__main__':
   sys.exit(main(sys.argv))
