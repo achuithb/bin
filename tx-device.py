@@ -9,35 +9,37 @@ DEVICE_IP='100.96.59.172'
 ALT_DEVICE_IP='100.96.56.235'
 VM_IP='localhost'
 VM_PORT='9222'
-HOME = os.environ['HOME']
-CHROME_DIR = os.path.join(HOME, 'code/chrome/src')
-CROS_DIR = os.path.join(HOME, 'code/cros')
-CATAPULT_DIR = os.path.join(HOME, 'code/catapult')
-BOARD = 'wolf'
 
+HOME = os.environ['HOME']
+BOARD = 'wolf'
 dryrun = 0
+
+
+def LocalPath(path):
+  return os.path.realpath(os.path.join(HOME, path))
+
+def LocalCrosPath(path):
+  return os.path.join(LocalPath('code/cros'), path)
+
 
 DIRECTORY_MAPPINGS = {
     '/tmp' : '/tmp',
     '/var/tmp' : '/var/tmp',
-    os.path.join(HOME, 'Downloads') : '/home/chronos/user/Downloads',
-    CHROME_DIR : '/usr/local/telemetry/src',
-    CATAPULT_DIR : '/usr/local/telemetry/src/third_party/catapult',
-    os.path.join(CROS_DIR,
-                 'src/third_party/autotest/files/client') :
-                     '/usr/local/autotest',
-    os.path.join(CROS_DIR,
-                 'src/third_party/autotest-tests-cheets/client/site_tests') :
-                     '/usr/local/autotest/tests',
-    os.path.join(CROS_DIR,
-                 'src/third_party/autotest-private/client/site_tests') :
-                     '/usr/local/autotest/tests',
-    os.path.join(CROS_DIR,
-                 'src/third_party/autotest/files/client/site_tests') :
-                     '/usr/local/autotest/tests',
-    os.path.join(CROS_DIR, 'chroot/build', BOARD,
-                 'usr/local/build/autotest/client/site_tests') :
-                     '/usr/local/autotest/tests',
+    LocalPath('Downloads') : '/home/chronos/user/Downloads',
+    LocalPath('code/chrome/src') : '/usr/local/telemetry/src',
+    LocalPath('code/catapult') :
+        '/usr/local/telemetry/src/third_party/catapult',
+    LocalCrosPath('src/third_party/autotest/files/client') :
+        '/usr/local/autotest',
+    LocalCrosPath('src/third_party/autotest-tests-cheets/client/site_tests') :
+        '/usr/local/autotest/tests',
+    LocalCrosPath('src/third_party/autotest-private/client/site_tests') :
+        '/usr/local/autotest/tests',
+    LocalCrosPath('src/third_party/autotest/files/client/site_tests') :
+        '/usr/local/autotest/tests',
+    LocalCrosPath(os.path.join('chroot/build', BOARD,
+                               'usr/local/build/autotest/client/site_tests')) :
+        '/usr/local/autotest/tests',
 }
 
 
