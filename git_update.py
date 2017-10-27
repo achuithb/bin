@@ -17,7 +17,7 @@ def Sync():
     return
   os.chdir(os.path.dirname(git_lib.CHROME_DIR))
   git_lib.RunCmd('gclient sync -j16')
-  os.chdir(os.path.dirname(git_lib.CHROME_DIR))
+  os.chdir(git_lib.CHROME_DIR)
 
 
 def All():
