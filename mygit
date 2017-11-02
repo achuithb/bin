@@ -5,12 +5,12 @@ import subprocess
 import sys
 
 import git_lib
-import run_cmd
+import utils
 
 def RepoUpload(args):
   cmd = 'repo upload . --cbr '
   cmd += args[0] if args and args[0] == '--no-verify' else '--verify'
-  run_cmd.RunCmd(cmd, call=True)
+  utils.RunCmd(cmd, call=True)
 
 
 def Update(args):
@@ -18,18 +18,18 @@ def Update(args):
     print 'Diff empty, nothing to update'
     return
 
-  if not git_lib.IsCrOS() and git_lib.GitNoCommit():
+  if not utils.IsCrOS() and git_lib.GitNoCommit():
     git_lib.GitCommit()
     return
 
-  if not git_lib.IsCrOS():
+  if not utils.IsCrOS():
     git_lib.GitSetUpstream('master')
   git_lib.GitCommitFixup()
   git_lib.GitAutoSquash()
 
 
 def Upload(args):
-  if git_lib.IsCrOS():
+  if utils.IsCrOS():
     RepoUpload(args)
   else:
     git_lib.GitSetUpstream('origin/master')
@@ -42,6 +42,8 @@ def Usage(argv):
 
 
 def main(argv):
+  utils.AssertCWD([utils.CROS_DIR, utils.CHROME_DIR, utils.CATAPULT_DIR])
+
   func_map = { 'upload': Upload, 'update': Update }
   if argv[1] not in func_map.keys():
     Usage(argv)

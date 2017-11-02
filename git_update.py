@@ -3,7 +3,7 @@
 import os, sys
 
 import git_lib
-import run_cmd
+import utils
 
 def Pull():
   git_lib.GitPull()
@@ -14,11 +14,11 @@ def Rebase():
 
 
 def Sync():
-  if (os.getcwd() != git_lib.CHROME_DIR):
+  if (os.getcwd() != utils.CHROME_DIR):
     return
-  os.chdir(os.path.dirname(git_lib.CHROME_DIR))
-  run_cmd.RunCmd('gclient sync -j16')
-  os.chdir(git_lib.CHROME_DIR)
+  os.chdir(os.path.dirname(utils.CHROME_DIR))
+  utils.RunCmd('gclient sync -j16')
+  os.chdir(utils.CHROME_DIR)
 
 
 def All():
@@ -28,7 +28,7 @@ def All():
 
 
 def main(argv):
-  repo_map = { 'chrome' : git_lib.CHROME_DIR, 'catapult': git_lib.CATAPULT_DIR }
+  repo_map = { 'chrome' : utils.CHROME_DIR, 'catapult': utils.CATAPULT_DIR }
   func_map = { 'pull' : Pull, 'rebase' : Rebase, 'sync': Sync, 'all': All }
 
   if (len(argv) != 2 or
@@ -37,9 +37,7 @@ def main(argv):
                               '|'.join(func_map.keys()))
     sys.exit(1)
 
-  if (os.getcwd() not in [git_lib.CHROME_DIR, git_lib.CATAPULT_DIR]):
-    print '%s is not a valid cwd for this command' % os.getcwd()
-    sys.exit(1)
+  utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
 
   git_lib.GitCheckoutMaster()
   func_map[argv[1]]()
