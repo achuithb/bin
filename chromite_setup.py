@@ -5,6 +5,7 @@ import subprocess
 import sys
 
 import git_lib
+import utils
 
 # Run this script from ~/code/chrome/src/third_party/chromite/
 # on master branch.
@@ -58,7 +59,7 @@ def Usage(argv):
 
 
 def main(argv):
-  git_lib.AssertCWD(CHROME_DIR)
+  utils.AssertCWD(CHROME_DIR)
 
   func_map = { 'create': Create, 'delete': Delete }
   if len(argv) != 2 or argv[1] not in func_map.keys():
