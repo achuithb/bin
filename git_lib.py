@@ -3,7 +3,7 @@
 import os
 import subprocess
 
-dry_run = False
+from run_cmd import RunCmd
 
 def AbsPath(path):
   return os.path.realpath(os.path.join(os.environ['HOME'], path))
@@ -16,23 +16,6 @@ MASTER_BRANCH = 'master'
 
 def IsCrOS():
   return os.getcwd().startswith(CROS_DIR)
-
-
-def RunCmd(args, call=False):
-  if isinstance(args, str):
-    args = args.split()
-  if not isinstance(args, list):
-    raise Exception('RunCmd: malformed cmd %r' % args)
-
-  print 'RunCmd: %s' % (' ').join(args)
-  if dry_run:
-    return 0
-  if call:
-    ret = subprocess.call(args)
-  else:
-    ret = subprocess.check_output(args)
-    print ret
-  return ret
 
 
 def GitBranch():

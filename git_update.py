@@ -3,6 +3,7 @@
 import os, sys
 
 import git_lib
+import run_cmd
 
 def Pull():
   git_lib.GitPull()
@@ -16,7 +17,7 @@ def Sync():
   if (os.getcwd() != git_lib.CHROME_DIR):
     return
   os.chdir(os.path.dirname(git_lib.CHROME_DIR))
-  git_lib.RunCmd('gclient sync -j16')
+  run_cmd.RunCmd('gclient sync -j16')
   os.chdir(git_lib.CHROME_DIR)
 
 

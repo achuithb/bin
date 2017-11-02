@@ -5,11 +5,12 @@ import subprocess
 import sys
 
 import git_lib
+import run_cmd
 
 def RepoUpload(args):
   cmd = 'repo upload . --cbr '
   cmd += args[0] if args and args[0] == '--no-verify' else '--verify'
-  git_lib.RunCmd(cmd, call=True)
+  run_cmd.RunCmd(cmd, call=True)
 
 
 def Update(args):
