@@ -32,7 +32,7 @@ def RunCmd(args, call=False, silent=False):
 
 
 def IsCrOS():
-  return os.getcwd().startswith(utils.CROS_DIR)
+  return os.getcwd().startswith(CROS_DIR)
 
 
 def AssertCWD(paths):
