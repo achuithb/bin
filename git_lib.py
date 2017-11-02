@@ -31,7 +31,7 @@ def RunCmd(args, call=False):
     ret = subprocess.call(args)
   else:
     ret = subprocess.check_output(args)
-    print 'RunCmd response:\n%s' % ret
+    print ret
   return ret
 
 
