@@ -12,20 +12,22 @@ CATAPULT_DIR = AbsPath('code/catapult')
 
 dry_run = False
 
-def RunCmd(args, call=False):
+def RunCmd(args, call=False, silent=False):
   if isinstance(args, str):
     args = args.split()
   if not isinstance(args, list):
     raise Exception('RunCmd: malformed cmd %r' % args)
 
-  print 'RunCmd: %s' % (' ').join(args)
+  if not silent:
+    print 'RunCmd: %s' % (' ').join(args)
   if dry_run:
     return 0
   if call:
     ret = subprocess.call(args)
   else:
     ret = subprocess.check_output(args)
-    print ret
+    if not silent:
+      print ret
   return ret
 
 

@@ -84,11 +84,6 @@ alias dir='ls -ltF'
 alias la='ls -A'
 alias l='ls -CF'
 
-alias gitupdate='git branch --set-upstream-to=master; git commit -a --fixup=HEAD; git rebase -i --autosquash'
-alias gitupload='git branch --set-upstream-to=origin/master; git cl upload; git branch --set-upstream-to=master'
-alias myssh='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/code/chrome/src/third_party/chromite/ssh_keys/testing_rsa $@'
-alias myscp='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ~/code/chrome/src/third_party/chromite/ssh_keys/testing_rsa $@'
-
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
