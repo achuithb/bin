@@ -14,17 +14,6 @@ SSH_ARGS = ['-o', 'UserKnownHostsFile=/dev/null', '-o',
 VM_HOST = ['root@localhost', '-p', '9222']
 
 
-def ParseArgs(argv):
-  parser = argparse.ArgumentParser('Script for SSH and SCP')
-  parser.add_argument('--forward-port', type=int, help='Port to forward')
-  parser.add_argument('--vm', action='store_true', default=False,
-                      help='SSH into VM')
-  parser.add_argument('--scp', action='store_true', default=False,
-                      help='SCP instead of SSH')
-
-  return parser.parse_known_args(argv[1:])
-
-
 def Remote(host, scp, vm, forward_port):
   cmd = ['scp'] if scp else ['ssh']
   cmd += SSH_ARGS
@@ -35,6 +24,16 @@ def Remote(host, scp, vm, forward_port):
   else:
     cmd += host
   utils.RunCmd(cmd, call=True, silent=True)
+
+
+def ParseArgs(argv):
+  parser = argparse.ArgumentParser('Script for SSH and SCP')
+  parser.add_argument('--forward-port', type=int, help='Port to forward')
+  parser.add_argument('--vm', action='store_true', default=False,
+                      help='SSH into VM')
+  parser.add_argument('--scp', action='store_true', default=False,
+                      help='SCP instead of SSH')
+  return parser.parse_known_args(argv[1:])
 
 
 def main(argv):
