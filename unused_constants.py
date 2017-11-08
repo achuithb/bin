@@ -3,9 +3,9 @@
 import re
 
 def grep(constant):
-  py_files = ['auth_server.py', 
-              'auth_server_unittest.py', 
-              'httpd.py', 
+  py_files = ['auth_server.py',
+              'auth_server_unittest.py',
+              'httpd.py',
               'httpd_unittest.py']
   for py_file in py_files:
     if constant in open(py_file, 'r').read():

@@ -16,7 +16,7 @@ def RepoUpload(args):
 def Update(args):
   if not git_lib.GitDiff():
     print 'Diff empty, nothing to update'
-    return
+    #return
 
   if not utils.IsCrOS() and git_lib.GitNoCommit():
     git_lib.GitCommit()
