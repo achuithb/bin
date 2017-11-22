@@ -19,7 +19,9 @@ FILES = [
     'scripts/cros_run_vm_test.py',
     'scripts/cros_vm.py',
     'cli/cros/cros_chrome_sdk.py',
+    'lib/constants.py',
     'lib/remote_access.py',
+    'lib/path_util.py',
 ]
 
 
