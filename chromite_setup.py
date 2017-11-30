@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import os
-import subprocess
+import shutil
 import sys
 
 import git_lib
@@ -15,38 +15,30 @@ CROS_DIR = os.path.join(BASE_DIR, 'cros/chromite')
 CHROME_DIR = os.path.join(BASE_DIR, 'chrome/src/third_party/chromite')
 MASTER_BRANCH = 'master'
 VM_TEST_BRANCH = 'chromite'
-FILES = [
-    'scripts/cros_run_vm_test.py',
-    'scripts/cros_vm.py',
-    'cli/cros/cros_chrome_sdk.py',
-    'lib/constants.py',
-    'lib/remote_access.py',
-    'lib/path_util.py',
+DIRS = [
+    'scripts',
+    'cli/cros',
+    'lib',
 ]
 
 
-def RemoveFile(filename):
-  try:
-    os.unlink(filename)
-  except OSError:
-    pass
-
-
-def CreateLink(filename):
-  print filename
-  source = os.path.join(CROS_DIR, filename)
-  link = os.path.join(CHROME_DIR, filename)
-  RemoveFile(link)
+def CreateLink(dirname):
+  print dirname
+  source = os.path.join(CROS_DIR, dirname)
+  link = os.path.join(CHROME_DIR, dirname)
+  shutil.rmtree(link)
   os.symlink(source, link)
   git_lib.GitAddFile(link)
+
 
 def Create():
   git_lib.AssertDetachedHead()
   git_lib.GitCreateBranch(MASTER_BRANCH)
   git_lib.GitCreateBranch(VM_TEST_BRANCH)
-  for filename in FILES:
-    CreateLink(filename)
+  for dirname in DIRS:
+    CreateLink(dirname)
   git_lib.GitCommitWithMessage('Chromite debugging')
+
 
 def Delete():
   git_lib.AssertOnBranch(VM_TEST_BRANCH)
