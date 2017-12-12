@@ -7,22 +7,28 @@ import sys
 import utils
 
 
+DUT_IP = '100.96.59.172'
 SSH_ARGS = ['-o', 'UserKnownHostsFile=/dev/null', '-o',
             'StrictHostKeyChecking=no', '-i',
             os.path.join(utils.CHROME_DIR,
                          'third_party/chromite/ssh_keys/testing_rsa')]
 VM_HOST = ['root@localhost', '-p', '9222']
+DUT_HOST = ['root@%s' % DUT_IP]
 
 
-def Remote(host, scp, vm, forward_port):
-  cmd = ['scp'] if scp else ['ssh']
+def Remote(opts, host):
+  cmd = ['scp'] if opts.scp else ['ssh']
   cmd += SSH_ARGS
-  if forward_port:
-    cmd += ['-L', '%d:localhost:%d' % (forward_port, forward_port)]
-  if vm:
+  if opts.forward_port:
+    cmd += ['-L', '%d:localhost:%d' % (opts.forward_port, opts.forward_port)]
+
+  if opts.vm:
     cmd += VM_HOST
+  elif opts.dut:
+    cmd += DUT_HOST
   else:
     cmd += host
+
   utils.RunCmd(cmd, call=True, silent=True)
 
 
@@ -31,6 +37,8 @@ def ParseArgs(argv):
   parser.add_argument('--forward-port', type=int, help='Port to forward')
   parser.add_argument('--vm', action='store_true', default=False,
                       help='SSH into VM')
+  parser.add_argument('--dut', action='store_true', default=False,
+                      help='SSH into DUT at %s' % DUT_IP)
   parser.add_argument('--scp', action='store_true', default=False,
                       help='SCP instead of SSH')
   return parser.parse_known_args(argv[1:])
@@ -38,7 +46,7 @@ def ParseArgs(argv):
 
 def main(argv):
   opts, host = ParseArgs(argv)
-  Remote(host, opts.scp, opts.vm, opts.forward_port)
+  Remote(opts, host)
 
 
 if __name__ == '__main__':
