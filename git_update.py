@@ -31,16 +31,18 @@ def main(argv):
   repo_map = { 'chrome' : utils.CHROME_DIR, 'catapult': utils.CATAPULT_DIR }
   func_map = { 'pull' : Pull, 'rebase' : Rebase, 'sync': Sync, 'all': All }
 
-  if (len(argv) != 2 or
-      argv[1] not in func_map.keys()):
-    print 'Usage: %s [%s]' % (os.path.basename(argv[0]),
-                              '|'.join(func_map.keys()))
+  func = 'all'
+  if (len(argv) == 2):
+    func = argv[1]
+    if func not in func_map.keys():
+      print 'Unrecognized command %s\nUsage: %s [%s]' % (
+          func, os.path.basename(argv[0]), '|'.join(func_map.keys()))
     sys.exit(1)
 
   utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
 
   git_lib.GitCheckoutMaster()
-  func_map[argv[1]]()
+  func_map[func]()
 
 
 if __name__ == '__main__':
