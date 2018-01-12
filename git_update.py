@@ -37,7 +37,7 @@ def main(argv):
     if func not in func_map.keys():
       print 'Unrecognized command %s\nUsage: %s [%s]' % (
           func, os.path.basename(argv[0]), '|'.join(func_map.keys()))
-    sys.exit(1)
+      sys.exit(1)
 
   utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
 
