@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import shutil
 import sys
 
 import git_lib
@@ -9,6 +10,7 @@ import utils
 # Run this script from ~/code/chrome/src/third_party/chromite/
 # on master branch.
 
+LINK = True
 BASE_DIR = '/usr/local/google/home/achuith/code/'
 CROS_DIR = os.path.join(BASE_DIR, 'cros/chromite')
 CHROME_DIR = os.path.join(BASE_DIR, 'chrome/src/third_party/chromite')
@@ -34,10 +36,13 @@ def RemoveFile(filename):
 def CreateLink(filename):
   print filename
   source = os.path.join(CROS_DIR, filename)
-  link = os.path.join(CHROME_DIR, filename)
-  RemoveFile(link)
-  os.symlink(source, link)
-  git_lib.GitAddFile(link)
+  dest = os.path.join(CHROME_DIR, filename)
+  RemoveFile(dest)
+  if LINK:
+    os.symlink(source, dest)
+  else:
+    shutil.copyfile(source, dest)
+  git_lib.GitAddFile(dest)
 
 def Create():
   git_lib.AssertDetachedHead()
