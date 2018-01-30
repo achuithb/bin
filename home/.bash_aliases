@@ -1,3 +1,5 @@
+alias dir='ls -ltF'
+
 ###BEGIN SSH-AGENT ENVIRONMENT SETUP###
 # determine if ssh-agent is running properly
 export SSH_AGENT_FILE=$HOME/.ssh/agent-stuff.$HOSTNAME
