@@ -46,11 +46,7 @@ export PYTHONPATH=/usr/local/buildtools/current/sitecustomize
 export CHROME_DEVEL_SANDBOX=/usr/local/sbin/chrome-devel-sandbox
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f /usr/local/google/home/achuith/code/google-cloud-sdk/path.bash.inc ]; then
-  source '/usr/local/google/home/achuith/code/google-cloud-sdk/path.bash.inc'
-fi
+if [ -f '/usr/local/google/home/achuith/code/google-cloud-sdk/path.bash.inc' ]; then source '/usr/local/google/home/achuith/code/google-cloud-sdk/path.bash.inc'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f /usr/local/google/home/achuith/code/google-cloud-sdk/completion.bash.inc ]; then
-  source '/usr/local/google/home/achuith/code/google-cloud-sdk/completion.bash.inc'
-fi
+if [ -f '/usr/local/google/home/achuith/code/google-cloud-sdk/completion.bash.inc' ]; then source '/usr/local/google/home/achuith/code/google-cloud-sdk/completion.bash.inc'; fi
