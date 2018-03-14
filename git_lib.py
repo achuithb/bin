@@ -43,7 +43,33 @@ def GitRebaseMaster(branch):
     return
 
   # This throws when rebase fails - handle this better.
-  utils.RunCmd('git rebase master %s' % branch)
+  try:
+    utils.RunCmd('git rebase master %s' % branch)
+  except subprocess.CalledProcessError as e:
+    print('rebase of branch %s failed' % branch)
+    if not RebaseFunctionHistogram():
+      raise e
+
+def RebaseFunctionHistogram():
+  histogram_file = 'extensions/browser/extension_function_histogram_value.h'
+  skip_lines = ['<<<<<<< HEAD', '=======', '>>>>>>>']
+
+  diff = GitDiff().split('\n')
+  if not diff or diff[0] != ('diff --cc %s' % histogram_file):
+    return False
+  content = ''
+  with open(histogram_file, 'r') as f:
+    for line in f:
+      for s in skip_lines:
+        if line and len(line) >= len(s) and line[0:len(s)] == s:
+           line = None
+      if line is not None:
+        content += line
+  open(histogram_file, 'w').write(content)
+
+  GitAddFile(histogram_file)
+  GitRebaseContinue()
+  return True
 
 
 def GitCreateBranch(new_branch):
@@ -76,6 +102,10 @@ def GitCommitFixup():
 
 def GitAutoSquash():
   utils.RunCmd('git rebase -i --autosquash', call=True)
+
+
+def GitRebaseContinue():
+  utils.RunCmd('git rebase --continue')
 
 
 def GitUpload():
