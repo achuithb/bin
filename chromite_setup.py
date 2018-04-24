@@ -22,8 +22,8 @@ FILES = [
     'scripts/deploy_chrome.py',
     'cli/cros/cros_chrome_sdk.py',
     'lib/constants.py',
-    'lib/chrome_util.py',
-    'lib/gs.py',
+    # 'lib/chrome_util.py',
+    # 'lib/gs.py',
     # 'lib/remote_access.py',
     # 'lib/path_util.py',
 ]
