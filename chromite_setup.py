@@ -23,6 +23,7 @@ FILES = [
     'cli/cros/cros_chrome_sdk.py',
     'lib/constants.py',
     'lib/chrome_util.py',
+    'lib/gs.py',
     # 'lib/remote_access.py',
     # 'lib/path_util.py',
 ]
