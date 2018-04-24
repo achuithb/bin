@@ -108,8 +108,11 @@ def GitRebaseContinue():
   utils.RunCmd('git rebase --continue')
 
 
-def GitUpload():
-  utils.RunCmd('git cl upload', call=True)
+def GitUpload(presubmit):
+  cmd = ['git', 'cl', 'upload']
+  if not presubmit:
+    cmd += ['--bypass-hooks']
+  utils.RunCmd(cmd, call=True)
 
 
 def GitDiff():

@@ -7,16 +7,24 @@ import utils
 
 def RepoUpload(args):
   cmd = 'repo upload . --cbr '
-  cmd += args[0] if args and args[0] == '--no-verify' else '--verify'
+  cmd += '--verify' if presubmit else '--no-verify'
   utils.RunCmd(cmd, call=True)
 
 
 def Upload(args):
+  presubmit = True
+  if args:
+    if args[0] == '--no-presubmit':
+      presubmit = False
+    else:
+      print 'Did you mean --no-presubmit?'
+      sys.exit(1)
+
   if utils.IsCrOS():
-    RepoUpload(args)
+    RepoUpload(presubmit)
   else:
     git_lib.GitSetUpstream('origin/master')
-    git_lib.GitUpload()
+    git_lib.GitUpload(presubmit)
     git_lib.GitSetUpstream('master')
 
 
