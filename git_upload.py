@@ -5,7 +5,7 @@ import sys
 import git_lib
 import utils
 
-def RepoUpload(args):
+def RepoUpload(presubmit):
   cmd = 'repo upload . --cbr '
   cmd += '--verify' if presubmit else '--no-verify'
   utils.RunCmd(cmd, call=True)
