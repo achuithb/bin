@@ -19,9 +19,10 @@ VM_TEST_BRANCH = 'chromite'
 FILES = [
     'scripts/cros_run_vm_test.py',
     'scripts/cros_vm.py',
-    'scripts/deploy_chrome.py',
     'cli/cros/cros_chrome_sdk.py',
-    'lib/constants.py',
+    'lib/cros_build_lib.py',
+    # 'scripts/deploy_chrome.py',
+    # 'lib/constants.py',
     # 'lib/chrome_util.py',
     # 'lib/gs.py',
     # 'lib/remote_access.py',
