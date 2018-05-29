@@ -51,6 +51,7 @@ def GitRebaseMaster(branch):
       raise e
 
 def RebaseFunctionHistogram():
+  return False
   histogram_file = 'extensions/browser/extension_function_histogram_value.h'
   skip_lines = ['<<<<<<< HEAD', '=======', '>>>>>>>']
 
