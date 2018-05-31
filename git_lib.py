@@ -132,7 +132,7 @@ def GitNoCommit():
 def GitPull():
   utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
   AssertOnBranch()
-  utils.RunCmd('git pull')
+  utils.RunCmd('git pull', call=True)
 
 
 def GitRebaseAll(skip_list = []):

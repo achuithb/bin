@@ -17,7 +17,7 @@ def Sync():
   if (os.getcwd() != utils.CHROME_DIR):
     return
   os.chdir(os.path.dirname(utils.CHROME_DIR))
-  utils.RunCmd('gclient sync -j16')
+  utils.RunCmd('gclient sync -j16', call=True)
   os.chdir(utils.CHROME_DIR)
 
 
