@@ -28,7 +28,7 @@ def Remote(opts, host):
   else:
     cmd += host
 
-  utils.RunCmd(cmd, call=True, silent=True)
+  utils.RunCmd(cmd, call=True)
 
 
 def ParseArgs(argv):
