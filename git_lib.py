@@ -16,8 +16,12 @@ def GitListBranches():
   return utils.RunCmd('git branch --format=%(refname:short)').rstrip().split()
 
 
+def GitCheckout(branch):
+  utils.RunCmd('git checkout %s' % branch)
+
+
 def GitCheckoutMaster():
-  utils.RunCmd('git checkout %s' % MASTER_BRANCH)
+  GitCheckout(MASTER_BRANCH)
 
 
 def DetachedHead():
@@ -82,7 +86,7 @@ def GitDeleteBranch(branch):
 
 
 def GitCheckoutHEAD():
-  utils.RunCmd('git checkout HEAD~')
+  GitCheckout('HEAD~')
 
 
 def GitAddFile(filename):
@@ -135,7 +139,9 @@ def GitPull():
   utils.RunCmd('git pull', call=True)
 
 
-def GitRebaseAll(skip_list = []):
+def GitRebaseAll(skip_list=None):
+  if not skip_list:
+    skip_list = []
   utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
   AssertOnBranch()
   for branch in GitListBranches():
