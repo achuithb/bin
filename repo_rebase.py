@@ -14,7 +14,7 @@ def RepoRebase(skip_list=None):
       utils.RunCmd('repo rebase .')
 
 def main(argv):
-  RepoRebase(['old_refactor'])
+  RepoRebase(['old_refactor', 'qemu_version_retry'])
 
 if __name__ == '__main__':
   sys.exit(main(sys.argv))
