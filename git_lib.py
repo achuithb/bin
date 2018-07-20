@@ -113,6 +113,10 @@ def GitRebaseContinue():
   utils.RunCmd('git rebase --continue')
 
 
+def GitRebaseAbort():
+  utils.RunCmd('git rebase --abort')
+
+
 def GitUpload(presubmit):
   cmd = ['git', 'cl', 'upload']
   if not presubmit:
