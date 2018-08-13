@@ -24,7 +24,7 @@ def RepoRebase(skip_list=None, final_branch=None):
     print 'Unrebased branches: %r' % unrebased
 
 def main(argv):
-  RepoRebase(['old_refactor'], 'unittest')
+  RepoRebase(['old_refactor'])
 
 if __name__ == '__main__':
   sys.exit(main(sys.argv))
