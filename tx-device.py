@@ -143,7 +143,7 @@ def TransferFile(filename, host, port, reverse):
       os.remove(src_path)
 
 
-def GetHostFromArgs(args):
+def GetHost(args):
   if args.host:
     return args.host
   if args.vm:
@@ -152,23 +152,23 @@ def GetHostFromArgs(args):
     return DEVICE_IP
   if args.alt_device:
     return ALT_DEVICE_IP
-  return DEVICE_IP
+  return VM_IP
 
 
-def GetPortFromArgs(args):
+def GetPort(args):
   if args.port:
     return args.port
   if args.vm:
     return VM_PORT
-  return args.port
+  return VM_PORT
 
 
 def TransferFiles(args):
   global dryrun
   dryrun = args.dryrun
 
-  host = GetHostFromArgs(args)
-  port = GetPortFromArgs(args)
+  host = GetHost(args)
+  port = GetPort(args)
   for filename in args.files:
     TransferFile(filename, host, port, args.reverse)
 
