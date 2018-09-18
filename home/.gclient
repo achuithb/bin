@@ -13,3 +13,4 @@ solutions = [
     "custom_deps": {},
   },
 ]
+target_os = ['chromeos']
