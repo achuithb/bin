@@ -11,7 +11,7 @@ VM_IP='localhost'
 VM_PORT='9222'
 
 HOME = os.environ['HOME']
-BOARD = 'wolf'
+BOARD = 'amd64-generic'
 dryrun = 0
 
 
@@ -37,6 +37,9 @@ DIRECTORY_MAPPINGS = {
         '/usr/local/autotest/tests',
     LocalCrosPath('src/third_party/autotest/files/client/site_tests') :
         '/usr/local/autotest/tests',
+    LocalCrosPath(os.path.join('chroot/build', BOARD,
+                               'usr/local/build/autotest/client')) :
+        '/usr/local/autotest',
     LocalCrosPath(os.path.join('chroot/build', BOARD,
                                'usr/local/build/autotest/client/site_tests')) :
         '/usr/local/autotest/tests',
