@@ -77,8 +77,11 @@ def RebaseFunctionHistogram():
   return True
 
 
-def GitCreateBranch(new_branch):
-  utils.RunCmd('git checkout -b %s' % new_branch)
+def GitCreateBranch(new_branch, commit=None):
+  cmd = 'git checkout -b %s' % new_branch
+  if commit:
+    cmd += ' ' + commit
+  utils.RunCmd(cmd)
 
 
 def GitDeleteBranch(branch):
