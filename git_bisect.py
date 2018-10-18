@@ -18,11 +18,6 @@ def CreateBranch(index):
   git_lib.GitCreateBranch('bisect_%d' % index, commit)
   utils.GclientSync()
 
-def Gen():
-  # This doesn't work.
-  utils.RunCmd(['gn', 'gen', 'out_amd64-generic/Release', "--args='%s'" %
-                os.environ['GN_ARGS'].replace('\n', ', ')])
-
 def RunTest():
   utils.RunCmd(
       'cros_run_vm_test --build --deploy --build-dir=out_amd64-generic/Release '
@@ -38,7 +33,6 @@ def main(argv):
   index = int(argv[1])
   utils.AssertCWD(utils.CHROME_DIR)
   CreateBranch(index)
-  # Gen()
   RunTest()
 
 
