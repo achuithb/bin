@@ -5,18 +5,18 @@ import os, sys
 import git_lib
 import utils
 
-def Usage():
-  print 'git_bisect.py index'
-  sys.exit(1)
+COMMIT_FILE = 'commit.txt'
 
 def CreateBranch(index):
-  # open commit file
-  with open('commit.txt') as f:
+  # open commit file.
+  with open(COMMIT_FILE) as f:
     lines = f.read().splitlines()
-  # commit <hash>
+  # format: commit <hash>
   _, commit = lines[index].split()
+
   git_lib.GitCreateBranch('bisect_%d' % index, commit)
   utils.GclientSync()
+
 
 def RunTest():
   utils.RunCmd(
@@ -28,11 +28,11 @@ def RunTest():
 
 def main(argv):
   if len(argv) < 1:
-    Usage()
+    print 'git_bisect.py index'
+    sys.exit(1)
 
-  index = int(argv[1])
   utils.AssertCWD(utils.CHROME_DIR)
-  CreateBranch(index)
+  CreateBranch(int(argv[1]))
   RunTest()
 
 
