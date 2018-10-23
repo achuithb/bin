@@ -7,7 +7,7 @@ import sys
 import utils
 
 
-DUT_HOST = '100.96.59.172'
+DUT_HOST = '100.96.28.37'
 VM_PORT = 9222
 SSH_ARGS = ['-o', 'UserKnownHostsFile=/dev/null', '-o',
             'StrictHostKeyChecking=no', '-i',
@@ -23,10 +23,8 @@ def Remote(opts, host):
 
   if opts.vm:
     cmd += ['root@localhost', '-p', str(opts.port)]
-  elif opts.dut:
-    cmd += ['root@%s' % opts.host]
   else:
-    cmd += host
+    cmd += ['root@%s' % opts.host]
 
   utils.RunCmd(cmd, call=True)
 
