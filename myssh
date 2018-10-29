@@ -4,25 +4,21 @@ import argparse
 import os
 import sys
 
+import constants
 import utils
-
-
-DUT_HOST = '100.96.28.37'
-VM_PORT = 9222
-SSH_ARGS = ['-o', 'UserKnownHostsFile=/dev/null', '-o',
-            'StrictHostKeyChecking=no', '-i',
-            os.path.join(utils.CHROME_DIR,
-                         'third_party/chromite/ssh_keys/testing_rsa')]
 
 
 def Remote(opts, host):
   cmd = ['scp'] if opts.scp else ['ssh']
-  cmd += SSH_ARGS
+  cmd += ['-o', 'UserKnownHostsFile=/dev/null', '-o',
+          'StrictHostKeyChecking=no', '-i',
+          os.path.join(utils.CHROME_DIR,
+                       'third_party/chromite/ssh_keys/testing_rsa')]
   if opts.forward_port:
     cmd += ['-L', '%d:localhost:%d' % (opts.forward_port, opts.forward_port)]
 
   if opts.vm:
-    cmd += ['root@localhost', '-p', str(opts.port)]
+    cmd += ['root@localhost', '-p', opts.port]
   else:
     cmd += ['root@%s' % opts.host]
 
@@ -34,12 +30,12 @@ def ParseArgs(argv):
   parser.add_argument('--forward-port', type=int, help='Port to forward')
   parser.add_argument('--vm', action='store_true', default=False,
                       help='SSH into VM')
-  parser.add_argument('--port', type=int, default=VM_PORT,
-                      help='VM port (default %d)' % VM_PORT)
+  parser.add_argument('--port', default=constants.VM_PORT,
+                      help='VM port (default %s)' % constants.VM_PORT)
   parser.add_argument('--dut', action='store_true', default=False,
                       help='SSH into DUT')
-  parser.add_argument('--host', default=DUT_HOST,
-                      help='DUT hostname (default %s)' % DUT_HOST)
+  parser.add_argument('--host', default=constants.DEVICE_IP,
+                      help='DUT hostname (default %s)' % constants.DEVICE_IP)
   parser.add_argument('--scp', action='store_true', default=False,
                       help='SCP instead of SSH')
   return parser.parse_known_args(argv[1:])

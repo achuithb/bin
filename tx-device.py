@@ -5,10 +5,7 @@ import subprocess
 import sys
 import os
 
-DEVICE_IP='100.96.59.172'
-ALT_DEVICE_IP='100.96.56.235'
-VM_IP='localhost'
-VM_PORT='9222'
+import constants
 
 HOME = os.environ['HOME']
 BOARD = 'amd64-generic'
@@ -150,20 +147,20 @@ def GetHost(args):
   if args.host:
     return args.host
   if args.vm:
-    return VM_IP
+    return constants.VM_IP
   if args.device:
-    return DEVICE_IP
+    return constants.DEVICE_IP
   if args.alt_device:
-    return ALT_DEVICE_IP
-  return VM_IP
+    return constants.ALT_DEVICE_IP
+  return constants.VM_IP
 
 
 def GetPort(args):
   if args.port:
     return args.port
   if args.vm:
-    return VM_PORT
-  return VM_PORT
+    return constants.VM_PORT
+  return constants.VM_PORT
 
 
 def TransferFiles(args):
@@ -180,11 +177,13 @@ def Parse():
   parser = argparse.ArgumentParser()
   parser.add_argument('--host', dest='host', help='hostname to connect to')
   parser.add_argument('files', help='files to transfer', nargs='*')
-  parser.add_argument('-p', '--port', dest='port', help='port')
+  parser.add_argument('-p', '--port', dest='port',
+                      help='port (default %s)' % constants.VM_PORT)
   parser.add_argument('--vm', action='store_true')
-  parser.add_argument('--device', action='store_true', help='%s' % DEVICE_IP)
+  parser.add_argument('--device', action='store_true',
+                      help='%s' % constants.DEVICE_IP)
   parser.add_argument('--alt-device', action='store_true',
-                      help='%s' % ALT_DEVICE_IP)
+                      help='%s' % constants.ALT_DEVICE_IP)
   parser.add_argument('-r', '--reverse', action='store_true')
   parser.add_argument('-d', '--dryrun', action='store_true')
   return parser.parse_args()
