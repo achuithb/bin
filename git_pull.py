@@ -10,7 +10,8 @@ def Pull():
 
 
 def Rebase():
-  git_lib.GitRebaseAll()
+  final_branch = None if utils.IsCrOS() else git_lib.MASTER_BRANCH
+  git_lib.GitRebaseAll(final_branch=final_branch)
 
 
 def Sync():
@@ -36,9 +37,10 @@ def main(argv):
           func, os.path.basename(argv[0]), '|'.join(func_map.keys()))
       sys.exit(1)
 
-  utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
+  # utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
 
-  git_lib.GitCheckoutMaster()
+  if not utils.IsCrOS():
+    git_lib.GitCheckoutMaster()
   func_map[func]()
 
 

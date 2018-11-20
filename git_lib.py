@@ -42,39 +42,19 @@ def GitSetUpstream(branch):
   utils.RunCmd('git branch --set-upstream-to=%s' % branch)
 
 
-def GitRebaseMaster(branch):
+def _GitRebaseMaster(branch, unrebased, committed):
   if branch == MASTER_BRANCH:
     return
 
-  # This throws when rebase fails - handle this better.
+  rebase_cmd = ('repo rebase .' if utils.IsCrOS()
+                else 'git rebase master %s' % branch)
   try:
-    utils.RunCmd('git rebase master %s' % branch)
-  except subprocess.CalledProcessError as e:
-    print('rebase of branch %s failed' % branch)
-    if not RebaseFunctionHistogram():
-      raise e
-
-def RebaseFunctionHistogram():
-  return False
-  histogram_file = 'extensions/browser/extension_function_histogram_value.h'
-  skip_lines = ['<<<<<<< HEAD', '=======', '>>>>>>>']
-
-  diff = GitDiff().split('\n')
-  if not diff or diff[0] != ('diff --cc %s' % histogram_file):
-    return False
-  content = ''
-  with open(histogram_file, 'r') as f:
-    for line in f:
-      for s in skip_lines:
-        if line and len(line) >= len(s) and line[0:len(s)] == s:
-           line = None
-      if line is not None:
-        content += line
-  open(histogram_file, 'w').write(content)
-
-  GitAddFile(histogram_file)
-  GitRebaseContinue()
-  return True
+    utils.RunCmd(rebase_cmd)
+  except subprocess.CalledProcessError:
+    GitRebaseAbort()
+    unrebased.append(branch)
+  if not GitIsAhead():
+    committed.append(branch)
 
 
 def GitCreateBranch(new_branch, commit=None):
@@ -141,18 +121,29 @@ def GitNoCommit():
 
 
 def GitPull():
-  utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
-  AssertOnBranch()
-  utils.RunCmd('git pull', call=True)
+  if utils.IsCrOS():
+    utils.RunCmd('repo sync', call=True)
+  else:
+    utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
+    AssertOnBranch()
+    utils.RunCmd('git pull', call=True)
 
 
-def GitRebaseAll(skip_list=None):
+def GitRebaseAll(skip_list=None, final_branch=None):
   if not skip_list:
     skip_list = []
-  utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
-  AssertOnBranch()
+  unrebased = []
+  committed = []
+  # utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
+  # AssertOnBranch()
   for branch in GitListBranches():
     if branch not in skip_list:
-      GitRebaseMaster(branch)
-  GitCheckoutMaster()
+      _GitRebaseMaster(branch, unrebased, committed)
+  if final_branch:
+    GitCheckout(final_branch)
+  if unrebased:
+    print 'Unrebased branches: %r' % unrebased
+  if committed:
+    print 'Fully committed branches: %r' % committed
+
 
