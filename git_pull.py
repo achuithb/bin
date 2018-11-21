@@ -21,8 +21,9 @@ def Sync():
 
 def All():
   Pull()
-  Sync()
-  Rebase()
+  if not utils.IsCrOS():
+    Sync()
+    Rebase()
 
 
 def main(argv):
