@@ -46,8 +46,12 @@ def _GitRebaseMaster(branch, unrebased, committed):
   if branch == MASTER_BRANCH:
     return
 
-  rebase_cmd = ('repo rebase .' if utils.IsCrOS()
-                else 'git rebase master %s' % branch)
+  if utils.IsCrOS():
+    rebase_cmd = 'repo rebase .'
+    GitCheckout(branch)
+  else:
+    rebase_cmd = 'git rebase master %s' % branch
+
   try:
     utils.RunCmd(rebase_cmd)
   except subprocess.CalledProcessError:
