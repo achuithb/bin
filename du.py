@@ -11,11 +11,18 @@ MIN_SIZE = 10  # Skip anything less than 10G.
 
 HOME = '/usr/local/google/home/achuith'
 CODE = os.path.join(HOME, 'code')
-CACHE = os.path.join(HOME, 'code/cros/chroot/var/cache')
+CROS = os.path.join(CODE, 'cros')
+CACHE = os.path.join(CROS, 'chroot/var/cache')
+CHROOT = os.path.join(CROS, 'chroot.img')
+
+
+def InGig(size):
+  return size/(1024 * 1024)
 
 
 def PrintUsageForDir(ary):
-  print '%s: %dG' % (ary[1], ary[0])
+  print '%s: %dG' % (ary[1], InGig(ary[0]))
+  sys.stdout.flush()
 
 
 def DiskUsage(d):
@@ -25,12 +32,19 @@ def DiskUsage(d):
   return ary  # (numblocks, name)
 
 
+def PrintUsageForChroot():
+  row = DiskUsage(CHROOT)
+  row[1] = os.path.relpath(row[1], HOME)
+  PrintUsageForDir(row)
+
+
 def PrintTotalUsage(cols, depth):
   for row in sorted(cols, reverse=True, key=lambda a: a[0]):
-    row[0] = row[0]/(1024 * 1024)
-    if row[0] < MIN_SIZE:
+    if InGig(row[0]) < MIN_SIZE:
       break;
     PrintUsageForDir(row)
+    if row[1] == 'code/cros':
+      PrintUsageForChroot()
     Recurse(row[1], depth)
 
 
@@ -60,7 +74,7 @@ def DefaultDir(path, depth):
 
 def DefaultDirs():
   DefaultDir(CODE, DEFAULT_DEPTH)
-  print '\n%s' % CACHE
+  print '\n%s' % os.path.relpath(CACHE, HOME)
   DefaultDir(CACHE, CACHE_DEPTH)
 
 
@@ -70,6 +84,7 @@ def main(argv):
     UsageForDirs(dirs, DEFAULT_DEPTH)
   else:
     DefaultDirs()
+
 
 if __name__ == '__main__':
   sys.exit(main(sys.argv))
