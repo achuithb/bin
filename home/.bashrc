@@ -80,7 +80,6 @@ fi
 
 # some more ls aliases
 alias ll='ls -AltF'
-alias dir='ls -ltF'
 alias la='ls -A'
 alias l='ls -CF'
 
