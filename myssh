@@ -17,7 +17,7 @@ def Remote(opts, host):
   if opts.forward_port:
     cmd += ['-L', '%d:localhost:%d' % (opts.forward_port, opts.forward_port)]
 
-  if opts.vm:
+  if opts.vm or (opts.port != constants.VM_PORT):
     cmd += ['root@localhost', '-p', opts.port]
   else:
     cmd += ['root@%s' % opts.host]
