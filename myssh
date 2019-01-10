@@ -7,6 +7,24 @@ import sys
 import constants
 import utils
 
+def IsVM(opts):
+  return opts.vm or (opts.port != constants.VM_PORT)
+
+
+def Deploy(opts, host):
+  cmd = ['deploy_chrome',
+         '--build-dir=out_%s/Release' % os.environ['SDK_BOARD']]
+
+  if opts.nostrip:
+    cmd += ['--mount', '--nostrip']
+
+  if IsVM(opts):
+    cmd += ['--to=localhost', '--port=%s' % opts.port]
+  else:
+    cmd += ['--to=%s' % host]
+
+  utils.RunCmd(cmd, call=True, dry_run=opts.dry_run)
+
 
 def Remote(opts, host):
   cmd = ['scp'] if opts.scp else ['ssh']
@@ -17,12 +35,12 @@ def Remote(opts, host):
   if opts.forward_port:
     cmd += ['-L', '%d:localhost:%d' % (opts.forward_port, opts.forward_port)]
 
-  if opts.vm or (opts.port != constants.VM_PORT):
+  if IsVM(opts):
     cmd += ['root@localhost', '-p', opts.port]
   else:
-    cmd += ['root@%s' % opts.host]
+    cmd += ['root@%s' % host]
 
-  utils.RunCmd(cmd, call=True)
+  utils.RunCmd(cmd, call=True, dry_run=opts.dry_run)
 
 
 def ParseArgs(argv):
@@ -34,16 +52,24 @@ def ParseArgs(argv):
                       help='VM port (default %s)' % constants.VM_PORT)
   parser.add_argument('--dut', action='store_true', default=False,
                       help='SSH into DUT')
-  parser.add_argument('--host', default=constants.DEVICE_IP,
-                      help='DUT hostname (default %s)' % constants.DEVICE_IP)
   parser.add_argument('--scp', action='store_true', default=False,
                       help='SCP instead of SSH')
+  parser.add_argument('--deploy', action='store_true', default=False,
+                      help='deploy_chrome instead of SSH')
+  parser.add_argument('--nostrip', action='store_true', default=False,
+                      help='use nostrip with deploy_chrome')
+  parser.add_argument('--dry-run', action='store_true', default=False,
+                      help='dry run')
   return parser.parse_known_args(argv[1:])
 
 
 def main(argv):
   opts, host = ParseArgs(argv)
-  Remote(opts, host)
+  host = constants.DEVICE_IP if not host else host[0]
+  if opts.deploy:
+    Deploy(opts, host)
+  else:
+    Remote(opts, host)
 
 
 if __name__ == '__main__':

@@ -12,7 +12,7 @@ CATAPULT_DIR = AbsPath('code/catapult')
 
 dry_run = False
 
-def RunCmd(args, call=False, silent=False):
+def RunCmd(args, call=False, silent=False, dry_run=dry_run):
   if isinstance(args, str):
     args = args.split()
   if not isinstance(args, list):
