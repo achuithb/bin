@@ -49,6 +49,4 @@ def AssertCWD(paths):
 
 
 def GclientSync():
-  os.chdir(os.path.dirname(CHROME_DIR))
   RunCmd('gclient sync -j16', call=True)
-  os.chdir(CHROME_DIR)
