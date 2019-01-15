@@ -6,24 +6,25 @@ import git_lib
 import utils
 
 def Pull():
-  git_lib.GitPull()
+  if not utils.IsCrOS() or utils.IsCrOS(root=True):
+    git_lib.GitPull()
 
 
 def Rebase():
+  if utils.IsCrOS(root=True):
+    return
   final_branch = None if utils.IsCrOS() else git_lib.MASTER_BRANCH
   git_lib.GitRebaseAll(final_branch=final_branch)
 
 
 def Sync():
-  if (os.getcwd() != utils.CHROME_DIR):
-    return
   utils.GclientSync()
+
 
 def All():
   Pull()
-  if not utils.IsCrOS():
-    Sync()
-    Rebase()
+  Sync()
+  Rebase()
 
 
 def main(argv):
@@ -37,8 +38,6 @@ def main(argv):
       print 'Unrecognized command %s\nUsage: %s [%s]' % (
           func, os.path.basename(argv[0]), '|'.join(func_map.keys()))
       sys.exit(1)
-
-  # utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
 
   if not utils.IsCrOS():
     git_lib.GitCheckoutMaster()

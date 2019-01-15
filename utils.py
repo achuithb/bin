@@ -31,8 +31,18 @@ def RunCmd(args, call=False, silent=False, dry_run=dry_run):
   return ret
 
 
-def IsCrOS():
-  return os.getcwd().startswith(CROS_DIR)
+def _IsPlatform(root_path, root):
+  cwd = os.getcwd()
+  return cwd == root_path if root else cwd.startswith(root_path)
+
+def IsCrOS(root=False):
+  return _IsPlatform(CROS_DIR, root)
+
+def IsChrome(root=False):
+  return _IsPlatform(CHROME_DIR, root)
+
+def IsCatapult(root=False):
+  return _IsPlatform(CATPULT_DIR, root)
 
 
 def AssertCWD(paths):
@@ -49,4 +59,5 @@ def AssertCWD(paths):
 
 
 def GclientSync():
-  RunCmd('gclient sync -j16', call=True)
+  if IsChrome():
+    RunCmd('gclient sync -j16', call=True)
