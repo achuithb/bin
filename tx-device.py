@@ -150,12 +150,12 @@ def GetHost(args):
     return constants.VM_IP
   if args.dut:
     return constants.DEVICE_IP
-  if args.alt_dut:
-    return constants.ALT_DEVICE_IP
   return constants.VM_IP
 
 
 def GetPort(args):
+  if args.host or args.dut:
+    return None
   if args.port:
     return args.port
   if args.vm:
@@ -182,8 +182,6 @@ def Parse():
   parser.add_argument('--vm', action='store_true')
   parser.add_argument('--dut', action='store_true',
                       help='%s' % constants.DEVICE_IP)
-  parser.add_argument('--alt-dut', action='store_true',
-                      help='%s' % constants.ALT_DEVICE_IP)
   parser.add_argument('-r', '--reverse', action='store_true')
   parser.add_argument('-d', '--dryrun', action='store_true')
   return parser.parse_args()
