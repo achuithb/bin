@@ -19,9 +19,11 @@ def LocalCrosPath(path):
   return os.path.join(LocalPath('code/cros'), path)
 
 
+# Desktop -> DUT.
 DIRECTORY_MAPPINGS = {
     '/tmp' : '/tmp',
     '/var/tmp' : '/var/tmp',
+    LocalPath('code/misc/logs') : '/var/log/chrome',
     LocalPath('Downloads') : '/home/chronos/user/Downloads',
     LocalPath('code/chrome/src') : '/usr/local/telemetry/src',
     LocalPath('code/catapult') :
