@@ -11,10 +11,9 @@ def Pull():
 
 
 def Rebase():
-  if utils.IsCrOS(root=True):
+  if utils.IsCrOS():
     return
-  final_branch = None if utils.IsCrOS() else git_lib.MASTER_BRANCH
-  git_lib.GitRebaseAll(final_branch=final_branch)
+  git_lib.GitRebaseAll(final_branch=git_lib.MASTER_BRANCH)
 
 
 def Sync():
