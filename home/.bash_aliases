@@ -5,6 +5,7 @@ alias dir='ls -ltF'
 export SSH_AGENT_FILE=$HOME/.ssh/agent-stuff.$HOSTNAME
 
 # Try to copy the existing agent stuff into the environment
+mkdir -p $HOME/.ssh/
 [ -r $SSH_AGENT_FILE ] && . $SSH_AGENT_FILE &&
     ssh-add -l >/dev/null 2>&1
 
