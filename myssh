@@ -25,6 +25,18 @@ def Deploy(opts, host):
 
   utils.RunCmd(cmd, call=True, dry_run=opts.dry_run)
 
+def ForwardPorts(opts):
+  forward_port = None
+  flag = None
+  if opts.forward_port:
+    forward_port = opts.forward_port
+    forward_flag = '-L'
+  if opts.remote_port_forward:
+    forward_port = opts.remote_port_forward
+    forward_flag = '-R'
+  if forward_port:
+    return [forward_flag, '%d:localhost:%d' % (forward_port, forward_port)]
+  return []
 
 def Remote(opts, host):
   cmd = ['scp'] if opts.scp else ['ssh']
@@ -32,8 +44,7 @@ def Remote(opts, host):
           'StrictHostKeyChecking=no', '-i',
           os.path.join(utils.CHROME_DIR,
                        'third_party/chromite/ssh_keys/testing_rsa')]
-  if opts.forward_port:
-    cmd += ['-L', '%d:localhost:%d' % (opts.forward_port, opts.forward_port)]
+  cmd += ForwardPorts(opts)
 
   if IsVM(opts):
     cmd += ['root@localhost', '-p', opts.port]
@@ -44,11 +55,13 @@ def Remote(opts, host):
 
 
 def ParseArgs(argv):
-  parser = argparse.ArgumentParser('Script for SSH and SCP')
-  parser.add_argument('--forward-port', type=int, help='Port to forward')
+  parser = argparse.ArgumentParser('Script for SSH/SCP/Deploy')
+  parser.add_argument('--forward-port', '-L', type=int, help='Port to forward')
+  parser.add_argument('--remote-port-forward', '-R', type=int,
+                      help='Remote port to forward')
   parser.add_argument('--vm', action='store_true', default=False,
                       help='SSH into VM')
-  parser.add_argument('--port', default=constants.VM_PORT,
+  parser.add_argument('--port', '-p', default=constants.VM_PORT,
                       help='VM port (default %s)' % constants.VM_PORT)
   parser.add_argument('--dut', action='store_true', default=False,
                       help='SSH into DUT')
