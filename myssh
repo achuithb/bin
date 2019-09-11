@@ -47,7 +47,8 @@ def Remote(opts, host, src, dest):
   cmd += ForwardPorts(opts)
 
   if IsVM(opts):
-    cmd += ['-p', opts.port]
+    port_flag = '-P' if opts.scp else '-p'
+    cmd += [port_flag, opts.port]
     remote = 'root@localhost'
   else:
     remote = 'root@%s' % host
