@@ -38,7 +38,7 @@ def ForwardPorts(opts):
     return [forward_flag, '%d:localhost:%d' % (forward_port, forward_port)]
   return []
 
-def Remote(opts, host):
+def Remote(opts, host, src, dest):
   cmd = ['scp'] if opts.scp else ['ssh']
   cmd += ['-o', 'UserKnownHostsFile=/dev/null', '-o',
           'StrictHostKeyChecking=no', '-i',
@@ -47,9 +47,15 @@ def Remote(opts, host):
   cmd += ForwardPorts(opts)
 
   if IsVM(opts):
-    cmd += ['root@localhost', '-p', opts.port]
+    cmd += ['-p', opts.port]
+    remote = 'root@localhost'
   else:
-    cmd += ['root@%s' % host]
+    remote = 'root@%s' % host
+  if src:
+    cmd += [src]
+  if dest:
+    remote += ':' + dest
+  cmd += [remote]
 
   utils.RunCmd(cmd, call=True, dry_run=opts.dry_run)
 
@@ -77,12 +83,20 @@ def ParseArgs(argv):
 
 
 def main(argv):
-  opts, host = ParseArgs(argv)
-  host = constants.DEVICE_IP if not host else host[0]
+  opts, rem = ParseArgs(argv)
+  src = None
+  dest = None
+  host = constants.DEVICE_IP
+  if opts.scp:
+    assert(len(rem) == 2), 'scp must have 2 args'
+    src = rem[0]
+    dest = rem[1]
+  elif rem:
+    host = rem[0]
   if opts.deploy:
     Deploy(opts, host)
   else:
-    Remote(opts, host)
+    Remote(opts, host, src, dest)
 
 
 if __name__ == '__main__':
