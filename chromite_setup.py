@@ -26,7 +26,7 @@ FILES = [
     'cli/cros/cros_flash.py',
     'cli/flash.py',
 
-    # USB support.
+    # Xbuddy.
     'lib/android_build.py',
     'lib/artifact_info.py',
     'lib/build_artifact.py',
@@ -39,7 +39,7 @@ FILES = [
     'lib/retry.py',
     'lib/xbuddy.py',
 
-    # Nebraska support.
+    # Nebraska.
     'lib/auto_updater.py',
     'lib/nebraska_wrapper.py',
     'lib/nebraska.py',
