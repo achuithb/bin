@@ -19,6 +19,7 @@ def Rebase(dirs):
     os.chdir(d)
     git_lib.GitRebaseAll()
     os.chdir(cwd)
+  git_lib.GitCheckoutMaster()
 
 
 def main(argv):

@@ -20,7 +20,8 @@ def GitCheckout(branch):
 
 
 def GitCheckoutMaster():
-  GitCheckout(MASTER_BRANCH)
+  if MASTER_BRANCH in GitListBranches():
+    GitCheckout(MASTER_BRANCH)
 
 
 def DetachedHead():
