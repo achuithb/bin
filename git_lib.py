@@ -143,8 +143,8 @@ def GitRebaseAll(skip_list=None, final_branch=None):
   if final_branch:
     GitCheckout(final_branch)
   if unrebased:
-    print 'Unrebased branches: %r' % unrebased
+    utils.ColorPrint(utils.RED, 'Unrebased branches: %r' % unrebased)
   if committed:
-    print 'Fully committed branches: %r' % committed
+    utils.ColorPrint(utils.GREEN, 'Fully committed branches: %r' % committed)
 
 

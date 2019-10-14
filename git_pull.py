@@ -6,15 +6,17 @@ import git_lib
 import utils
 
 
-WORK_IN_PROGRESS = ['chromite',
-                    'src/platform/dev',
-                    'src/third_party/chromiumos-overlay']
+WIP = [os.path.join(utils.CROS_DIR, w) for w in
+       ['chromite',
+        'src/platform/dev',
+        'src/third_party/chromiumos-overlay']
+       ]
 
 
 def CrOSCheckoutMaster():
-  for wip in WORK_IN_PROGRESS:
-    os.chdir(os.path.join(utils.CROS_DIR, wip))
+  for wip in WIP:
     print(wip)
+    os.chdir(wip)
     git_lib.GitCheckoutMaster()
 
 
@@ -27,8 +29,9 @@ def Pull():
 
 def Rebase():
   if utils.IsCrOS():
-    return
-  git_lib.GitRebaseAll(final_branch=git_lib.MASTER_BRANCH)
+    utils.RepoRebase(WIP)
+  else:
+    git_lib.GitRebaseAll(final_branch=git_lib.MASTER_BRANCH)
 
 
 def Sync():

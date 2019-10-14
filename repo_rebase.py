@@ -1,30 +1,13 @@
 #!/usr/bin/python
 
-import os, sys
+import sys
 
-import git_lib
 import utils
 
 
-def Rebase(dirs):
-  if not dirs and utils.IsCrOS(root=True):
-    print('Must specify directories to rebase.')
-    sys.exit(1)
-
-  if not dirs:
-    dirs += ['.']
-  cwd = os.getcwd()
-  for d in dirs:
-    print('Rebasing %s' % d)
-    os.chdir(d)
-    git_lib.GitRebaseAll()
-    os.chdir(cwd)
-  git_lib.GitCheckoutMaster()
-
-
 def main(argv):
-  dirs = argv[1:] if len(argv) else []
-  Rebase(dirs)
+  dirs = argv[1:] if len(argv) else None
+  utils.RepoRebase(dirs)
 
 
 if __name__ == '__main__':

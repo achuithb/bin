@@ -12,6 +12,14 @@ CATAPULT_DIR = AbsPath('code/catapult')
 
 dry_run = False
 
+BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
+
+def ColorPrint(color, text):
+  color = '\033[1;%dm' % (30 + color)
+  reset = '\033[0m'
+  print(color + text + reset)
+
+
 def RunCmd(args, call=False, silent=False, dry_run=dry_run):
   if isinstance(args, str):
     args = args.split()
@@ -19,7 +27,7 @@ def RunCmd(args, call=False, silent=False, dry_run=dry_run):
     raise Exception('RunCmd: malformed cmd %r' % args)
 
   if not silent:
-    print 'RunCmd: %s' % (' ').join(args)
+    ColorPrint(CYAN, 'RunCmd: %s' % (' ').join(args))
   if dry_run:
     return 0
   if call:
@@ -61,3 +69,21 @@ def AssertCWD(paths):
 def GclientSync():
   if IsChrome():
     RunCmd('gclient sync -D -j16', call=True)
+
+
+def RepoRebase(dirs):
+  if not dirs and IsCrOS(root=True):
+    ColorPrint(RED, 'Must specify directories to rebase.')
+    sys.exit(1)
+
+  import git_lib
+
+  if not dirs:
+    dirs = ['.']
+  cwd = os.getcwd()
+  for d in dirs:
+    ColorPrint(BLUE, 'Rebasing %s' % d)
+    os.chdir(d)
+    git_lib.GitRebaseAll()
+    os.chdir(cwd)
+  git_lib.GitCheckoutMaster()
