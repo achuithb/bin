@@ -5,8 +5,23 @@ import os, sys
 import git_lib
 import utils
 
+
+WORK_IN_PROGRESS = ['chromite',
+                    'src/platform/dev',
+                    'src/third_party/chromiumos-overlay']
+
+
+def CrOSCheckoutMaster():
+  for wip in WORK_IN_PROGRESS:
+    os.chdir(os.path.join(utils.CROS_DIR, wip))
+    print(wip)
+    git_lib.GitCheckoutMaster()
+
+
 def Pull():
-  if not utils.IsCrOS() or utils.IsCrOS(root=True):
+  if utils.IsCrOS():
+    utils.RunCmd('repo sync', call=True)
+  else:
     git_lib.GitPull()
 
 
@@ -38,8 +53,11 @@ def main(argv):
           func, os.path.basename(argv[0]), '|'.join(func_map.keys()))
       sys.exit(1)
 
-  if not utils.IsCrOS():
+  if utils.IsCrOS():
+    CrOSCheckoutMaster()
+  else:
     git_lib.GitCheckoutMaster()
+
   func_map[func]()
 
 

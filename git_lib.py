@@ -125,12 +125,9 @@ def GitNoCommit():
 
 
 def GitPull():
-  if utils.IsCrOS():
-    utils.RunCmd('repo sync', call=True)
-  else:
-    utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
-    AssertOnBranch()
-    utils.RunCmd('git pull', call=True)
+  utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
+  AssertOnBranch()
+  utils.RunCmd('git pull', call=True)
 
 
 def GitRebaseAll(skip_list=None, final_branch=None):
