@@ -60,4 +60,4 @@ def AssertCWD(paths):
 
 def GclientSync():
   if IsChrome():
-    RunCmd('gclient sync -j16', call=True)
+    RunCmd('gclient sync -D -j16', call=True)
