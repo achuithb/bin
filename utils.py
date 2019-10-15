@@ -85,5 +85,5 @@ def RepoRebase(dirs):
     ColorPrint(BLUE, 'Rebasing %s' % d)
     os.chdir(d)
     git_lib.GitRebaseAll()
+    git_lib.GitCheckoutMaster()
     os.chdir(cwd)
-  git_lib.GitCheckoutMaster()
