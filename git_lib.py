@@ -5,6 +5,7 @@ import subprocess
 import utils
 
 MASTER_BRANCH = 'master'
+CHROMITE = 'chromite'
 
 
 def GitBranch():
@@ -57,7 +58,7 @@ def _GitRebaseMaster(branch, unrebased, committed):
   except subprocess.CalledProcessError:
     GitRebaseAbort()
     unrebased.append(branch)
-  if not GitIsAhead():
+  if not GitIsAhead() and branch != CHROMITE:
     committed.append(branch)
 
 
