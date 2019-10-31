@@ -6,27 +6,6 @@ import utils
 
 
 FILES = [
-    '__init__.py',
-    'nebraska.py',
-    'nebraska_unittest.py',
-    'README.md',
-    'sample.json',
-]
-
-FILES = [
-    'android_build.py',
-    'artifact_info.py',
-    'build_artifact.py',
-    'build_util.py',
-    'common_util.py',
-    'devserver_constants.py',
-    'downloader.py',
-    'log_util.py',
-    'retry.py',
-    'xbuddy.py',
-]
-
-FILES = [
     'android_build.py',
     'artifact_info.py',
     'build_artifact.py',
@@ -38,11 +17,16 @@ FILES = [
     'downloader.py',
     'downloader_unittest.py',
     'log_util.py',
+    'retry.py',
+    'xbuddy.py',
+    'xbuddy_unittest.py',
 ]
 
+# android_build.py artifact_info.py build_artifact.py build_artifact_unittest.py build_util.py common_util.py common_util_unittest.py devserver_constants.py downloader.py downloader_unittest.py log_util.py retry.py xbuddy.py xbuddy_unittest.py
 
-PLATFORM = 'src/platform/dev'
-CHROMITE = 'chromite/lib'
+
+PLATFORM = 'src/platform/dev/'
+CHROMITE = 'chromite/lib/xbuddy/'
 
 def main(argv):
   for f in FILES:
