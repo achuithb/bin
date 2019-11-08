@@ -21,7 +21,8 @@ def Update():
 
 
 def main(argv):
-  utils.AssertCWD([utils.CROS_DIR, utils.CHROME_DIR, utils.CATAPULT_DIR])
+  utils.AssertCWD([utils.CROS_DIR, utils.CHROME_DIR,
+                   utils.CATAPULT_DIR, utils.BIN_DIR])
   Update();
 
 if __name__ == '__main__':

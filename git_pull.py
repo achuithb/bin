@@ -9,6 +9,7 @@ import utils
 WIP = [
     os.path.join(utils.CROS_DIR, w) for w in [
         'chromite',
+        'docs',
         'src/platform/dev',
         'src/third_party/chromiumos-overlay',
         'src/third_party/autotest/files',

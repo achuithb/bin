@@ -6,6 +6,7 @@ import subprocess
 def AbsPath(path):
   return os.path.realpath(os.path.join(os.environ['HOME'], path))
 
+BIN_DIR = AbsPath('code/bin')
 CROS_DIR = AbsPath('code/cros')
 CHROME_DIR = AbsPath('code/chrome/src')
 CATAPULT_DIR = AbsPath('code/catapult')
