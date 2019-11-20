@@ -64,7 +64,11 @@ def AssertCWD(paths):
     path = os.path.realpath(path)
     if os.path.commonprefix([path, os.getcwd()]) == path:
       return
-  raise Exception('Not at expected path(s) %r' % paths)
+  msg = 'Not at expected path(s): %r' % [
+      os.path.basename(path) for path in paths
+  ]
+  ColorPrint(RED, msg)
+  raise Exception(msg)
 
 
 def GclientSync():
