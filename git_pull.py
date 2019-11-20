@@ -2,26 +2,9 @@
 
 import os, sys
 
+import cros_utils
 import git_lib
 import utils
-
-
-WIP = [
-    os.path.join(utils.CROS_DIR, w) for w in [
-        'chromite',
-        'docs',
-        'src/platform/dev',
-        'src/third_party/chromiumos-overlay',
-        'src/third_party/autotest/files',
-    ]
-]
-
-
-def CrOSCheckoutMaster():
-  for wip in WIP:
-    print(wip)
-    os.chdir(wip)
-    git_lib.GitCheckoutMaster()
 
 
 def Pull():
@@ -33,7 +16,7 @@ def Pull():
 
 def Rebase():
   if utils.IsCrOS():
-    utils.RepoRebase(WIP)
+    cros_utils.RepoRebase()
   else:
     git_lib.GitRebaseAll(final_branch=git_lib.MASTER_BRANCH)
 
@@ -61,7 +44,7 @@ def main(argv):
       sys.exit(1)
 
   if utils.IsCrOS():
-    CrOSCheckoutMaster()
+    cros_utils.CheckoutMaster()
   else:
     git_lib.GitCheckoutMaster()
 

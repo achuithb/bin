@@ -7,9 +7,9 @@ def AbsPath(path):
   return os.path.realpath(os.path.join(os.environ['HOME'], path))
 
 BIN_DIR = AbsPath('code/bin')
-CROS_DIR = AbsPath('code/cros')
-CHROME_DIR = AbsPath('code/chrome/src')
 CATAPULT_DIR = AbsPath('code/catapult')
+CHROME_DIR = AbsPath('code/chrome/src')
+CROS_DIR = AbsPath('code/cros')
 
 dry_run = False
 
@@ -70,21 +70,3 @@ def AssertCWD(paths):
 def GclientSync():
   if IsChrome():
     RunCmd('gclient sync -D -j16', call=True)
-
-
-def RepoRebase(dirs):
-  if not dirs and IsCrOS(root=True):
-    ColorPrint(RED, 'Must specify directories to rebase.')
-    sys.exit(1)
-
-  import git_lib
-
-  if not dirs:
-    dirs = ['.']
-  cwd = os.getcwd()
-  for d in dirs:
-    ColorPrint(BLUE, 'Rebasing %s' % d)
-    os.chdir(d)
-    git_lib.GitRebaseAll()
-    git_lib.GitCheckoutMaster()
-    os.chdir(cwd)

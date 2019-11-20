@@ -3,11 +3,12 @@
 import sys
 
 import cros_utils
+import utils
 
 
 def main(argv):
-  dirs = argv[1:] if len(argv) else None
-  cros_utils.RepoRebase(dirs)
+  utils.AssertCWD(utils.CROS_DIR)
+  cros_utils.CheckoutMaster()
 
 
 if __name__ == '__main__':
