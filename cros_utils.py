@@ -17,24 +17,26 @@ WIP = [
 ]
 
 
-def CheckoutMaster():
-  if not utils.IsCrOS():
-    return
-  for wip in WIP:
+def _GetDirs(dirs):
+  if dirs:
+    return dirs
+  if utils.IsCrOS(root=True):
+    return WIP
+  return ['.']
+
+
+def CheckoutMaster(dirs=None):
+  utils.AssertCWD(utils.CROS_DIR)
+  for wip in _GetDirs(dirs):
     print(wip)
     os.chdir(wip)
     git_lib.GitCheckoutMaster()
 
 
-def RepoRebase(dirs):
-  AssertCWD(utils.CROS_DIR)
-  if not dirs and IsCrOS(root=True):
-    dirs = WIP
-  if not dirs:
-    dirs = ['.']
-
+def RepoRebase(dirs=None):
+  utils.AssertCWD(utils.CROS_DIR)
   cwd = os.getcwd()
-  for d in dirs:
+  for d in _GetDirs(dirs):
     utils.ColorPrint(BLUE, 'Rebasing %s' % d)
     os.chdir(d)
     git_lib.GitRebaseAll()

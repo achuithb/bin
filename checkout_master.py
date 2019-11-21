@@ -8,7 +8,8 @@ import utils
 
 def main(argv):
   utils.AssertCWD(utils.CROS_DIR)
-  cros_utils.CheckoutMaster()
+  dirs = argv[1:] if len(argv) else None
+  cros_utils.CheckoutMaster(dirs)
 
 
 if __name__ == '__main__':
