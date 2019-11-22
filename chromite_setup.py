@@ -17,31 +17,12 @@ CHROME_DIR = os.path.join(BASE_DIR, 'chrome/src/third_party/chromite')
 MASTER_BRANCH = 'master'
 VM_TEST_BRANCH = 'chromite'
 FILES = [
-    'lib/vm.py',
-    'cli/cros/cros_chrome_sdk.py',
-    'lib/cros_test_lib.py',
-
-    # Xbuddy.
-    # 'lib/android_build.py',
-    # 'lib/artifact_info.py',
-    # 'lib/build_artifact.py',
-    # 'lib/build_util.py',
-    # 'lib/common_util.py',
-    # 'lib/dev_server_wrapper.py',
-    # 'lib/devserver_constants.py',
-    # 'lib/downloader.py',
-    # 'lib/log_util.py',
-    # 'lib/retry.py',
-    # 'lib/xbuddy.py',
-
-    # Nebraska.
-    # 'lib/auto_updater.py',
-    # 'lib/nebraska_wrapper.py',
-    # 'lib/nebraska.py',
-
+    # 'lib/vm.py',
+    # 'cli/cros/cros_chrome_sdk.py',
     # 'cli/cros/cros_flash.py',
     # 'cli/flash.py',
     # 'lib/cros_build_lib.py',
+    # 'lib/cros_test_lib.py',
     # 'lib/path_util.py',
     # 'lib/gs.py',
     # 'lib/paygen/paygen_payload_lib.py',
@@ -49,6 +30,11 @@ FILES = [
     # 'lib/constants.py',
     # 'lib/chrome_util.py',
     # 'lib/remote_access.py',
+
+    # Nebraska.
+    # 'lib/auto_updater.py',
+    'lib/auto_updater_transfer.py'
+    'lib/nebraska_wrapper.py',
 ]
 
 

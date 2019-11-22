@@ -37,7 +37,7 @@ def RepoRebase(dirs=None):
   utils.AssertCWD(utils.CROS_DIR)
   cwd = os.getcwd()
   for d in _GetDirs(dirs):
-    utils.ColorPrint(BLUE, 'Rebasing %s' % d)
+    utils.ColorPrint(utils.BLUE, 'Rebasing %s' % d)
     os.chdir(d)
     git_lib.GitRebaseAll()
     git_lib.GitCheckoutMaster()
