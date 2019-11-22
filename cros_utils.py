@@ -31,6 +31,7 @@ def CheckoutMaster(dirs=None):
     print(wip)
     os.chdir(wip)
     git_lib.GitCheckoutMaster()
+  os.chdir(utils.CROS_DIR)
 
 
 def RepoRebase(dirs=None):
