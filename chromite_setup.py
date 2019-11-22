@@ -19,7 +19,7 @@ VM_TEST_BRANCH = 'chromite'
 FILES = [
     # 'lib/vm.py',
     # 'cli/cros/cros_chrome_sdk.py',
-    # 'cli/cros/cros_flash.py',
+    'cli/cros/cros_flash.py',
     # 'cli/flash.py',
     # 'lib/cros_build_lib.py',
     # 'lib/cros_test_lib.py',
@@ -33,7 +33,7 @@ FILES = [
 
     # Nebraska.
     # 'lib/auto_updater.py',
-    'lib/auto_updater_transfer.py'
+    'lib/auto_updater_transfer.py',
     'lib/nebraska_wrapper.py',
 ]
 
