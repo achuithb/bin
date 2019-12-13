@@ -9,11 +9,8 @@ DEFAULT_DEPTH = 7
 CACHE_DEPTH = 4
 MIN_SIZE = 10  # Skip anything less than 10G.
 
-HOME = '/usr/local/google/home/achuith'
-CODE = os.path.join(HOME, 'code')
-CROS = os.path.join(CODE, 'cros')
-CACHE = os.path.join(CROS, 'chroot/var/cache')
-CHROOT = os.path.join(CROS, 'chroot.img')
+CHROOT_CACHE = os.path.join(utils.CROS_DIR, 'chroot/var/cache')
+CHROOT = os.path.join(utils.CROS_DIR, 'chroot.img')
 
 
 def InGig(size):
@@ -34,7 +31,7 @@ def DiskUsage(d):
 
 def PrintUsageForChroot():
   row = DiskUsage(CHROOT)
-  row[1] = os.path.relpath(row[1], HOME)
+  row[1] = os.path.relpath(row[1], utils.HOME_DIR)
   PrintUsageForDir(row)
 
 
@@ -72,10 +69,22 @@ def DefaultDir(path, depth):
   UsageForDirs([os.path.basename(path)], depth)
 
 
+def DF():
+  res = utils.RunCmd('df -h', silent=True).rstrip().split('\n')
+  k = res[0].split()
+  for r in res:
+    v = r.split()
+    # print v
+    if v[0] == 'objfsd':
+      print('%s=%s, %s=%s, %s=%s, %s=%s' % (
+          k[1], v[1], k[2], v[2], k[3], v[3], k[4], v[4]))
+
+
 def DefaultDirs():
-  DefaultDir(CODE, DEFAULT_DEPTH)
-  print '\n%s' % os.path.relpath(CACHE, HOME)
-  DefaultDir(CACHE, CACHE_DEPTH)
+  DF()
+  DefaultDir(utils.CODE_DIR, DEFAULT_DEPTH)
+  print '\n%s' % os.path.relpath(CHROOT_CACHE, utils.HOME_DIR)
+  DefaultDir(CHROOT_CACHE, CACHE_DEPTH)
 
 
 def main(argv):

@@ -3,9 +3,11 @@
 import os
 import subprocess
 
-def AbsPath(path):
+def AbsPath(path=''):
   return os.path.realpath(os.path.join(os.environ['HOME'], path))
 
+HOME_DIR = AbsPath()
+CODE_DIR = AbsPath('code')
 BIN_DIR = AbsPath('code/bin')
 CATAPULT_DIR = AbsPath('code/catapult')
 CHROME_DIR = AbsPath('code/chrome/src')
