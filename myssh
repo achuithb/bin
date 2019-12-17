@@ -12,7 +12,7 @@ def IsVM(opts):
 
 
 def Deploy(opts, host):
-  cmd = ['deploy_chrome',
+  cmd = ['deploy_chrome', '--force',
          '--build-dir=out_%s/Release' % os.environ['SDK_BOARD']]
 
   if opts.nostrip:
