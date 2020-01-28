@@ -13,6 +13,7 @@ WIP = [
         'src/platform/dev',
         'src/third_party/chromiumos-overlay',
         'src/third_party/autotest/files',
+        'src/third_party/autotest-private',
     ]
 ]
 
