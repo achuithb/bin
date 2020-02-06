@@ -17,7 +17,7 @@ CHROME_DIR = os.path.join(BASE_DIR, 'chrome/src/third_party/chromite')
 MASTER_BRANCH = 'master'
 VM_TEST_BRANCH = 'chromite'
 FILES = [
-    # 'lib/vm.py',
+    'lib/vm.py',
     'cli/cros/cros_chrome_sdk.py',
     # 'cli/cros/cros_flash.py',
     # 'cli/flash.py',
@@ -25,7 +25,7 @@ FILES = [
     # 'lib/cros_test_lib.py',
     # 'lib/path_util.py',
     # 'lib/gs.py',
-    # 'lib/paygen/paygen_payload_lib.py',
+    'lib/paygen/paygen_payload_lib.py',
     # 'scripts/deploy_chrome.py',
     # 'lib/constants.py',
     # 'lib/chrome_util.py',
