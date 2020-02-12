@@ -3,4 +3,3 @@ is_component_build = true
 use_goma = true
 goma_dir = "/usr/local/google/home/achuith/code/goma"
 enable_nacl = false
-remove_webcore_debug_symbols = true
