@@ -13,7 +13,11 @@ def GitBranch():
 
 
 def GitListBranches():
-  return utils.RunCmd('git branch --format=%(refname:short)').rstrip().split()
+  branches = utils.RunCmd('git branch --format=%(refname:short)').rstrip()
+  if (branches.find('HEAD detached at') != -1 or
+      branches.find('no branch') != -1):
+    return []
+  return branches.split()
 
 
 def GitCheckout(branch):
