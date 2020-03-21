@@ -120,6 +120,10 @@ def GitDiff():
   return utils.RunCmd('git diff')
 
 
+def GitApply(diff_file):
+  return utils.RunCmd(['git', 'apply', diff_file])
+
+
 def GitIsAhead():
   return utils.RunCmd('git status -sb').find('ahead') != -1
 
