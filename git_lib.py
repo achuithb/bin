@@ -121,7 +121,10 @@ def GitDiff():
 
 
 def GitApply(diff_file):
-  return utils.RunCmd(['git', 'apply', diff_file])
+  try:
+    return utils.RunCmd(['git', 'apply', diff_file])
+  except subprocess.CalledProcessError as e:
+    utils.ColorPrint(utils.RED, 'git apply failed : %r' % e)
 
 
 def GitIsAhead():
