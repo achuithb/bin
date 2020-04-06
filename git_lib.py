@@ -122,7 +122,7 @@ def GitDiff():
 
 def GitApply(diff_file):
   try:
-    return utils.RunCmd(['git', 'apply', diff_file])
+    return utils.RunCmd(['git', 'apply', '--3way', diff_file])
   except subprocess.CalledProcessError as e:
     utils.ColorPrint(utils.RED, 'git apply failed : %r' % e)
 
