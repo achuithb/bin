@@ -14,7 +14,7 @@ LINK = True
 BASE_DIR = '/usr/local/google/home/achuith/code/'
 CROS_DIR = os.path.join(BASE_DIR, 'cros/chromite')
 CHROME_DIR = os.path.join(BASE_DIR, 'chrome/src/third_party/chromite')
-MASTER_BRANCH = 'master'
+MASTER_BRANCH = 'head'
 VM_TEST_BRANCH = 'chromite'
 FILES = [
     'lib/vm.py',
