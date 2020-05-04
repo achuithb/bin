@@ -26,7 +26,7 @@ export P4EDITOR=$EDITOR
 umask 022
 
 # Path customizations - depot_tools, goma, gold.
-PATH=$HOME/code/bin:$HOME/code/depot_tools:$HOME/code/goma:/usr/local/gold/bin:$HOME/code/chrome/src/chromeos/assistant/libassistant/src/third_party/emsdk:$HOME/code/chrome/src/chromeos/assistant/libassistant/src/third_party/emsdk/fastcomp/emscripten:$HOME/code/chrome/src/chromeos/assistant/libassistant/src/third_party/emsdk/node/12.9.1_64bit/bin:$PATH
+PATH=/usr/local/gold/bin:$HOME/code/bin:$HOME/code/depot_tools:$HOME/code/goma:$HOME/code/skylab:$HOME/code/chrome/src/chromeos/assistant/libassistant/src/third_party/emsdk:$HOME/code/chrome/src/chromeos/assistant/libassistant/src/third_party/emsdk/fastcomp/emscripten:$HOME/code/chrome/src/chromeos/assistant/libassistant/src/third_party/emsdk/node/12.9.1_64bit/bin:$PATH
 
 # for Eclipse
 export profile=final

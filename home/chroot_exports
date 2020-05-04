@@ -1,4 +1,4 @@
-export CHROME_ORIGIN=LOCAL_SOURCE
+# export CHROME_ORIGIN=LOCAL_SOURCE
 export CHROME_ROOT="/tmp/chrome_root"
 export FEATURES="-usersandbox"
 export USE="chrome_internal"
