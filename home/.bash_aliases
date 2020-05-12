@@ -46,6 +46,9 @@ export PYTHONPATH=/usr/local/buildtools/current/sitecustomize
 # linux sandbox
 export CHROME_DEVEL_SANDBOX=/usr/local/sbin/chrome-devel-sandbox
 
+# cloudtop
+export SKIP_GCE_AUTH_FOR_GIT=1
+
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/usr/local/google/home/achuith/code/google-cloud-sdk/path.bash.inc' ]; then source '/usr/local/google/home/achuith/code/google-cloud-sdk/path.bash.inc'; fi
 
