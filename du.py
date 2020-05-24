@@ -10,7 +10,7 @@ CACHE_DEPTH = 4
 MIN_SIZE = 10  # Skip anything less than 10G.
 
 CHROOT_CACHE = os.path.join(utils.CROS_DIR, 'chroot/var/cache')
-CHROOT = os.path.join(utils.CROS_DIR, 'chroot.img')
+CHROOT_IMG = os.path.join(utils.CROS_DIR, 'chroot.img')
 
 
 def InGig(size):
@@ -30,7 +30,7 @@ def DiskUsage(d):
 
 
 def PrintUsageForChroot():
-  row = DiskUsage(CHROOT)
+  row = DiskUsage(CHROOT_IMG)
   row[1] = os.path.relpath(row[1], utils.HOME_DIR)
   PrintUsageForDir(row)
 
@@ -64,7 +64,7 @@ def UsageForDirs(dirs, depth):
   PrintTotalUsage(cols, depth)
 
 
-def DefaultDir(path, depth):
+def DefaultDir(path, depth=DEFAULT_DEPTH):
   os.chdir(os.path.dirname(path))
   UsageForDirs([os.path.basename(path)], depth)
 
@@ -82,9 +82,11 @@ def DF():
 
 def DefaultDirs():
   DF()
-  DefaultDir(utils.CODE_DIR, DEFAULT_DEPTH)
-  print '\n%s' % os.path.relpath(CHROOT_CACHE, utils.HOME_DIR)
-  DefaultDir(CHROOT_CACHE, CACHE_DEPTH)
+  DefaultDir(utils.CODE_DIR)
+  if os.path.exists(CHROOT_CACHE):
+    print '\n%s' % os.path.relpath(CHROOT_CACHE, utils.HOME_DIR)
+    DefaultDir(CHROOT_CACHE, CACHE_DEPTH)
+  DefaultDir(os.path.join(utils.HOME_DIR, 'Downloads'))
 
 
 def main(argv):
