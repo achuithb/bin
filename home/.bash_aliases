@@ -35,7 +35,7 @@ export ECLIPSE_MEM_MAX="3072M"
 export ECLIPSE_MEM_START="2048M"
 
 #for goma
-GOMA_DIR=${HOME}/code/goma
+# GOMA_DIR=${HOME}/code/goma
 
 # for gyp
 export GYP_GENERATORS="ninja"
