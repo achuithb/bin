@@ -1,5 +1,5 @@
 target_os = "chromeos"
 is_component_build = true
 use_goma = true
-goma_dir = "/usr/local/google/home/achuith/code/goma"
+# goma_dir = "/usr/local/google/home/achuith/code/goma"
 enable_nacl = false
