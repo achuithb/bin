@@ -1,18 +1,18 @@
 #!/usr/bin/python
 
+import argparse
 import sys
 
 import utils
 
 
-def Usage(argv):
-  print 'Usage: %s' % argv[0].split('/')[-1]
-  sys.exit(1)
+def ParseArgs(argv):
+  parser = argparse.ArgumentParser('Script')
+  return parser.parse_known_args(argv[1:])
 
 
 def main(argv):
-  if len(argv) < 1:
-    Usage(argv)
+  opts, rem = ParseArgs(argv)
 
 
 if __name__ == '__main__':
