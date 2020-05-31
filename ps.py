@@ -25,7 +25,7 @@ def ParseArgs(argv):
 
 def main(argv):
   opts, _ = ParseArgs(argv)
-  PS(opts.mem, opts.num)
+  PS(opts.mem, int(opts.num))
 
 
 if __name__ == '__main__':
