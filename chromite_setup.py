@@ -86,8 +86,6 @@ def ParseArgs(argv):
                       help='create chromite links')
   parser.add_argument('--delete', action='store_true', default=False,
                       help='delete chromite links')
-  parser.add_argument('--dry-run', action='store_true', default=False,
-                      help='dry run')
   return parser.parse_known_args(argv[1:])
 
 
@@ -97,10 +95,9 @@ def main(argv):
 
   if rem:
     raise Exception('Unknown args: %s' % rem)
-
   if ((opts.create and opts.delete) or
       (not opts.create and not opts.delete)):
-    raise Exception('Pick one of create or delete.')
+    raise Exception('Pick one of --create or --delete.')
 
   if opts.create:
     Create()
