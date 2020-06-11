@@ -1,11 +1,13 @@
 #!/usr/bin/python
 
+import argparse
 import os
 import shutil
 import sys
 
 import git_lib
 import utils
+
 
 # Run this script from ~/code/chrome/src/third_party/chromite/
 # on master branch.
@@ -78,20 +80,33 @@ def Delete():
   git_lib.GitDeleteBranch(VM_TEST_BRANCH)
 
 
-def Usage(argv):
-  print 'Usage: %s [create|delete]' % argv[0].split('/')[-1]
-  sys.exit(1)
+def ParseArgs(argv):
+  parser = argparse.ArgumentParser('Setup chromite links in chrome source')
+  parser.add_argument('--create', action='store_true', default=False,
+                      help='create chromite links')
+  parser.add_argument('--delete', action='store_true', default=False,
+                      help='delete chromite links')
+  parser.add_argument('--dry-run', action='store_true', default=False,
+                      help='dry run')
+  return parser.parse_known_args(argv[1:])
 
 
 def main(argv):
+  opts, rem = ParseArgs(argv)
   utils.AssertCWD(CHROME_DIR)
 
-  func_map = { 'create': Create, 'delete': Delete }
-  if len(argv) != 2 or argv[1] not in func_map.keys():
-    Usage(argv)
-  func_map[argv[1]]()
+  if rem:
+    raise Exception('Unknown args: %s' % rem)
+
+  if ((opts.create and opts.delete) or
+      (not opts.create and not opts.delete)):
+    raise Exception('Pick one of create or delete.')
+
+  if opts.create:
+    Create()
+  if opts.delete:
+    Delete()
 
 
 if __name__ == '__main__':
   sys.exit(main(sys.argv))
-
