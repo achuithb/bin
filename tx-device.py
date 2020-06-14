@@ -20,6 +20,7 @@ def LocalCrosPath(path):
 
 
 # Desktop -> DUT.
+# TODO: Move to cros_paths
 DIRECTORY_MAPPINGS = {
     '/tmp' : '/tmp',
     '/var/tmp' : '/var/tmp',

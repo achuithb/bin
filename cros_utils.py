@@ -2,30 +2,16 @@
 
 import os, sys
 
+import cros_paths
 import git_lib
 import utils
-
-
-WIP = [
-    os.path.join(utils.CROS_DIR, w) for w in [
-        'chromite',
-        'docs',
-        'src/platform/dev',
-        'src/platform2',
-        'src/private-overlays/overlay-amd64-generic-cheets-private',
-        'src/private-overlays/overlay-betty-private',
-        'src/third_party/chromiumos-overlay',
-        'src/third_party/autotest/files',
-        'src/third_party/autotest-private',
-    ]
-]
 
 
 def _GetDirs(dirs):
   if dirs:
     return dirs
   if utils.IsCrOS(root=True):
-    return WIP
+    return cros_paths.WORKING_DIRS
   return ['.']
 
 
