@@ -23,9 +23,9 @@ def Upload(args):
   if utils.IsCrOS():
     RepoUpload(verify)
   else:
-    git_lib.GitSetUpstream('origin/master')
+    git_lib.GitSetUpstream(git_lib.ORIGIN_MASTER)
     git_lib.GitUpload(verify)
-    git_lib.GitSetUpstream('master')
+    git_lib.GitSetUpstream(git_lib.MASTER)
 
 
 def main(argv):

@@ -7,6 +7,13 @@ import git_lib
 import utils
 
 
+def CheckoutMaster():
+  if utils.IsCrOS():
+    cros_utils.CheckoutMaster()
+  else:
+    git_lib.GitCheckoutMaster()
+
+
 def Pull():
   if utils.IsCrOS():
     utils.RunCmd('repo sync', call=True)
@@ -42,11 +49,6 @@ def main(argv):
       print 'Unrecognized command %s\nUsage: %s [%s]' % (
           func, os.path.basename(argv[0]), '|'.join(func_map.keys()))
       sys.exit(1)
-
-  if utils.IsCrOS():
-    cros_utils.CheckoutMaster()
-  else:
-    git_lib.GitCheckoutMaster()
 
   func_map[func]()
 

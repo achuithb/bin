@@ -4,7 +4,9 @@ import subprocess
 
 import utils
 
-MASTER_BRANCH = 'master'
+MASTER = 'master'
+CROS_MASTER = 'cros/master'
+ORIGIN_MASTER = 'origin/master'
 CHROMITE = 'chromite'
 
 
@@ -25,15 +27,15 @@ def GitCheckout(branch):
 
 
 def GitCheckoutMaster():
-  if MASTER_BRANCH in GitListBranches():
-    GitCheckout(MASTER_BRANCH)
+  if MASTER in GitListBranches():
+    GitCheckout(MASTER)
 
 
 def DetachedHead():
   return (utils.RunCmd('git status -sb').rstrip() == '## HEAD (no branch)')
 
 
-def AssertOnBranch(branch=MASTER_BRANCH):
+def AssertOnBranch(branch=MASTER):
   if GitBranch() != branch:
     raise Exception('Not in expected branch %s.' % branch)
 
@@ -48,14 +50,14 @@ def GitSetUpstream(branch):
 
 
 def _GitRebaseMaster(branch, unrebased, committed):
-  if branch == MASTER_BRANCH:
+  if branch == MASTER:
     return
 
   if utils.IsCrOS():
     rebase_cmd = 'repo rebase .'
     GitCheckout(branch)
   else:
-    rebase_cmd = 'git rebase master %s' % branch
+    rebase_cmd = 'git rebase %s %s' % (MASTER, branch)
 
   try:
     utils.RunCmd(rebase_cmd)
@@ -133,7 +135,7 @@ def GitIsAhead():
 
 def GitNoCommit():
   return utils.RunCmd('git log --oneline --decorate -1').find(
-      'origin/master') != -1
+      ORIGIN_MASTER) != -1
 
 
 def GitPull():
