@@ -7,7 +7,10 @@ import git_lib
 import utils
 
 
-def _GetDirs(dirs):
+CROS_MASTER = 'cros/master'
+
+
+def _GetDirs(dirs=None):
   if dirs:
     return dirs
   if utils.IsCrOS(root=True):
@@ -15,12 +18,14 @@ def _GetDirs(dirs):
   return ['.']
 
 
-def CheckoutMaster(dirs=None):
+def CheckoutCrosMaster():
   utils.AssertCWD(utils.CROS_DIR)
-  for wip in _GetDirs(dirs):
-    print(wip)
+  for wip in _GetDirs():
+    utils.ColorPrint(utils.BLUE, wip)
     os.chdir(wip)
-    git_lib.GitCheckoutMaster()
+    if not git_lib.DetachedHead():
+      git_lib.GitCheckout(CROS_MASTER)
+    git_lib.GitDeleteMaster()
   os.chdir(utils.CROS_DIR)
 
 
@@ -28,9 +33,9 @@ def RepoRebase(dirs=None):
   utils.AssertCWD(utils.CROS_DIR)
   cwd = os.getcwd()
   for d in _GetDirs(dirs):
-    utils.ColorPrint(utils.BLUE, 'Rebasing %s' % d)
+    utils.ColorPrint(utils.YELLOW, 'Rebasing %s' % d)
     os.chdir(d)
+    git_lib.GitCreateMaster()
     git_lib.GitRebaseAll()
-    git_lib.GitCheckoutMaster()
     utils.RunCmd('pyclean .')
     os.chdir(cwd)

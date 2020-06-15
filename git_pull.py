@@ -9,7 +9,7 @@ import utils
 
 def CheckoutMaster():
   if utils.IsCrOS():
-    cros_utils.CheckoutMaster()
+    cros_utils.CheckoutCrosMaster()
   else:
     git_lib.GitCheckoutMaster()
 
@@ -25,7 +25,7 @@ def Rebase():
   if utils.IsCrOS():
     cros_utils.RepoRebase()
   else:
-    git_lib.GitRebaseAll(final_branch=git_lib.MASTER_BRANCH)
+    git_lib.GitRebaseAll()
 
 
 def Sync():
@@ -33,13 +33,13 @@ def Sync():
 
 
 def All():
-  Pull()
+  CheckoutMaster()
+  # Pull()
   Sync()
   Rebase()
 
 
 def main(argv):
-  repo_map = { 'chrome' : utils.CHROME_DIR, 'catapult': utils.CATAPULT_DIR }
   func_map = { 'pull' : Pull, 'rebase' : Rebase, 'sync': Sync, 'all': All }
 
   func = 'all'

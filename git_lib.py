@@ -5,7 +5,6 @@ import subprocess
 import utils
 
 MASTER = 'master'
-CROS_MASTER = 'cros/master'
 ORIGIN_MASTER = 'origin/master'
 CHROMITE = 'chromite'
 
@@ -14,12 +13,15 @@ def GitBranch():
   return utils.RunCmd('git symbolic-ref --short HEAD').rstrip()
 
 
+def IsBranchHead(branch):
+  return (branch == MASTER or
+          branch.find('HEAD detached at') != -1 or
+          branch.find('no branch') != -1)
+
+
 def GitListBranches():
-  branches = utils.RunCmd('git branch --format=%(refname:short)').rstrip()
-  if (branches.find('HEAD detached at') != -1 or
-      branches.find('no branch') != -1):
-    return []
-  return branches.split()
+  return utils.RunCmd(
+      'git branch --format=%(refname:short)').rstrip().split('\n')
 
 
 def GitCheckout(branch):
@@ -29,6 +31,21 @@ def GitCheckout(branch):
 def GitCheckoutMaster():
   if MASTER in GitListBranches():
     GitCheckout(MASTER)
+
+
+def GitDeleteMaster():
+  AssertDetachedHead()
+  if MASTER in GitListBranches():
+    utils.RunCmd('git branch -d %s' % MASTER)
+
+
+def GitCreateMaster():
+  AssertDetachedHead()
+  branches = GitListBranches()
+  if len(branches) == 1:
+    return
+  if MASTER not in branches:
+    GitCreateBranch(MASTER)
 
 
 def DetachedHead():
@@ -49,8 +66,8 @@ def GitSetUpstream(branch):
   utils.RunCmd('git branch --set-upstream-to=%s' % branch)
 
 
-def _GitRebaseMaster(branch, unrebased, committed):
-  if branch == MASTER:
+def GitRebase(branch, unrebased, committed):
+  if IsBranchHead(branch):
     return
 
   if utils.IsCrOS():
@@ -144,21 +161,20 @@ def GitPull():
   utils.RunCmd('git pull', call=True)
 
 
-def GitRebaseAll(skip_list=None, final_branch=None):
+def GitRebaseAll(skip_list=None):
   if not skip_list:
     skip_list = []
+  if MASTER not in skip_list:
+    skip_list.append(MASTER)
   unrebased = []
   committed = []
-  # utils.AssertCWD([utils.CHROME_DIR, utils.CATAPULT_DIR])
-  # AssertOnBranch()
-  for branch in GitListBranches():
+  branches = GitListBranches()
+  for branch in branches:
     if branch not in skip_list:
-      _GitRebaseMaster(branch, unrebased, committed)
-  if final_branch:
-    GitCheckout(final_branch)
+      GitRebase(branch, unrebased, committed)
+  if MASTER in branches:
+    GitCheckout(MASTER)
   if unrebased:
     utils.ColorPrint(utils.RED, 'Unrebased branches: %r' % unrebased)
   if committed:
     utils.ColorPrint(utils.GREEN, 'Fully committed branches: %r' % committed)
-
-

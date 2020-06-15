@@ -15,7 +15,7 @@ CROS_DIR = AbsPath('code/cros')
 
 dry_run = False
 
-BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
+BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN = range(7)
 
 def ColorPrint(color, text):
   color = '\033[1;%dm' % (30 + color)
@@ -38,7 +38,7 @@ def RunCmd(args, call=False, silent=False, dry_run=dry_run):
   else:
     ret = subprocess.check_output(args)
     if not silent:
-      print ret
+      print(ret)
   return ret
 
 
