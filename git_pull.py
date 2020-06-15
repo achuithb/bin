@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
-import os, sys
+import argparse
+import os
+import sys
 
 import cros_utils
 import git_lib
@@ -34,23 +36,40 @@ def Sync():
 
 def All():
   CheckoutMaster()
-  # Pull()
+  Pull()
   Sync()
   Rebase()
 
 
+def ParseArgs(argv):
+  parser = argparse.ArgumentParser('Script')
+  parser.add_argument('--checkout-master', action='store_true', default=False,
+                      help='checkout master')
+  parser.add_argument('--pull', action='store_true', default=False,
+                      help='git pull')
+  parser.add_argument('--sync', action='store_true', default=False,
+                      help='gclient sync')
+  parser.add_argument('--rebase', action='store_true', default=False,
+                      help='rebase')
+  return parser.parse_known_args(argv[1:])
+
+
 def main(argv):
-  func_map = { 'pull' : Pull, 'rebase' : Rebase, 'sync': Sync, 'all': All }
+  opts, rem = ParseArgs(argv)
 
-  func = 'all'
-  if (len(argv) == 2):
-    func = argv[1]
-    if func not in func_map.keys():
-      print 'Unrecognized command %s\nUsage: %s [%s]' % (
-          func, os.path.basename(argv[0]), '|'.join(func_map.keys()))
-      sys.exit(1)
+  if rem:
+    raise Exception('Unknown args: %s' % rem)
 
-  func_map[func]()
+  if opts.checkout_master:
+    CheckoutMaster()
+  if opts.pull:
+    Pull()
+  if opts.sync:
+    Sync()
+  if opts.rebase:
+    Rebase()
+  if len(argv) == 1:
+    All()
 
 
 if __name__ == '__main__':
