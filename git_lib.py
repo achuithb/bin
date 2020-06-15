@@ -40,8 +40,12 @@ def GitDeleteMaster():
 
 
 def GitCreateMaster():
-  AssertDetachedHead()
   branches = GitListBranches()
+  if MASTER in branches:
+    GitCheckout(MASTER)
+    return
+
+  AssertDetachedHead()
   if len(branches) == 1:
     return
   if MASTER not in branches:
