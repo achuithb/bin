@@ -17,8 +17,7 @@ LINK = True
 BASE_DIR = '/usr/local/google/home/achuith/code/'
 CROS_DIR = os.path.join(BASE_DIR, 'cros/chromite')
 CHROME_DIR = os.path.join(BASE_DIR, 'chrome/src/third_party/chromite')
-MASTER_BRANCH = 'head'
-VM_TEST_BRANCH = 'chromite'
+CHROMITE = 'chromite'
 
 
 def RemoveFile(filename):
@@ -41,17 +40,30 @@ def CreateLink(filename):
 
 def Create():
   git_lib.AssertDetachedHead()
-  git_lib.GitCreateBranch(MASTER_BRANCH)
-  git_lib.GitCreateBranch(VM_TEST_BRANCH)
+  git_lib.GitCreateBranch(CHROMITE)
   for filename in cros_paths.CHROMITE_FILES:
     CreateLink(filename)
   git_lib.GitCommitWithMessage('Chromite debugging')
 
+
 def Delete():
-  git_lib.AssertOnBranch(VM_TEST_BRANCH)
+  git_lib.AssertOnBranch(CHROMITE)
   git_lib.GitCheckoutHEAD()
-  git_lib.GitDeleteBranch(MASTER_BRANCH)
-  git_lib.GitDeleteBranch(VM_TEST_BRANCH)
+  git_lib.GitDeleteBranch(CHROMITE)
+
+
+def Run(create, delete):
+  if create and delete:
+    raise Exception('Pick one of --create or --delete.')
+
+  if not create and not delete:
+    create = git_lib.DetachedHead()
+    delete = not create
+
+  if create:
+    Create()
+  if delete:
+    Delete()
 
 
 def ParseArgs(argv):
@@ -69,14 +81,7 @@ def main(argv):
 
   if rem:
     raise Exception('Unknown args: %s' % rem)
-  if ((opts.create and opts.delete) or
-      (not opts.create and not opts.delete)):
-    raise Exception('Pick one of --create or --delete.')
-
-  if opts.create:
-    Create()
-  if opts.delete:
-    Delete()
+  Run(opts.create, opts.delete)
 
 
 if __name__ == '__main__':
