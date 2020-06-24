@@ -4,6 +4,7 @@ import argparse
 import os
 import sys
 
+import chromite_setup
 import cros_utils
 import git_lib
 import utils
@@ -13,6 +14,11 @@ def CheckoutMaster():
   if utils.IsCrOS():
     cros_utils.CheckoutCrosMaster()
   else:
+    if utils.IsChrome():
+      os.chdir(chromite_setup.CHROME_DIR)
+      if not git_lib.DetachedHead():
+        raise Exception('chromite branch active.')
+      os.chdir(utils.CHROME_DIR)
     git_lib.GitCheckoutMaster()
 
 
