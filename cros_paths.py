@@ -20,18 +20,18 @@ WORKING_DIRS = [
 ]
 
 CHROMITE_FILES = [
-    # 'lib/vm.py',
-    # 'cli/cros/cros_chrome_sdk.py',
-    # 'cli/cros/cros_flash.py',
-    # 'cli/flash.py',
+    'lib/vm.py',
+    'cli/cros/cros_chrome_sdk.py',
+    'cli/cros/cros_flash.py',
+    'cli/flash.py',
     # 'lib/cros_build_lib.py',
     # 'lib/dev_server_wrapper.py',
     # 'lib/path_util.py',
     # 'lib/gs.py',
-    'lib/cros_test.py',
-    'lib/cros_test_unittest.py',
+    # 'lib/cros_test.py',
+    # 'lib/cros_test_unittest.py',
     # 'lib/paygen/paygen_payload_lib.py',
-    # 'scripts/deploy_chrome.py',
+    'scripts/deploy_chrome.py',
     # 'lib/constants.py',
     # 'lib/chrome_util.py',
     # 'lib/remote_access.py',
@@ -45,5 +45,5 @@ CHROMITE_FILES = [
     # 'lib/xbuddy/build_artifact.py',
     # 'lib/xbuddy/common_util.py',
     # 'lib/xbuddy/downloader.py',
-    'lib/xbuddy/xbuddy.py',
+    # 'lib/xbuddy/xbuddy.py',
 ]
