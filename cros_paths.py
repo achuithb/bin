@@ -5,6 +5,8 @@ import os
 import utils
 
 
+SCRIPTS_DIR = os.path.join(utils.CROS_DIR, 'src', 'scripts')
+
 WORKING_DIRS = [
     os.path.join(utils.CROS_DIR, w) for w in [
         'chromite',

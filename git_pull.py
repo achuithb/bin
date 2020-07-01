@@ -6,6 +6,7 @@ import sys
 
 import chromite_setup
 import cros_utils
+import cros_paths
 import git_lib
 import utils
 
@@ -29,6 +30,10 @@ def Pull():
     git_lib.GitPull()
 
 
+def Sync():
+  utils.GclientSync()
+
+
 def Rebase():
   if utils.IsCrOS():
     cros_utils.RepoRebase()
@@ -36,8 +41,11 @@ def Rebase():
     git_lib.GitRebaseAll()
 
 
-def Sync():
-  utils.GclientSync()
+def Finish():
+  if utils.IsCrOS():
+    os.chdir(cros_paths.SCRIPTS_DIR)
+    git_lib.GitCheckout(cros_utils.SCRIPTS_BASH_COMPLETION)
+    os.chdir(utils.CROS_DIR)
 
 
 def All():
@@ -45,18 +53,16 @@ def All():
   Pull()
   Sync()
   Rebase()
+  Finish()
 
 
 def ParseArgs(argv):
   parser = argparse.ArgumentParser('Script')
-  parser.add_argument('--checkout-master', action='store_true', default=False,
-                      help='checkout master')
-  parser.add_argument('--pull', action='store_true', default=False,
-                      help='git pull')
-  parser.add_argument('--sync', action='store_true', default=False,
-                      help='gclient sync')
-  parser.add_argument('--rebase', action='store_true', default=False,
-                      help='rebase')
+  parser.add_argument('--checkout-master', action='store_true', default=False)
+  parser.add_argument('--pull', action='store_true', default=False)
+  parser.add_argument('--sync', action='store_true', default=False)
+  parser.add_argument('--rebase', action='store_true', default=False)
+  parser.add_argument('--finish', action='store_true', default=False)
   return parser.parse_known_args(argv[1:])
 
 
@@ -74,6 +80,8 @@ def main(argv):
     Sync()
   if opts.rebase:
     Rebase()
+  if opts.finish:
+    Finish()
   if len(argv) == 1:
     All()
 

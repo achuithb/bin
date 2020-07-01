@@ -8,6 +8,7 @@ import utils
 
 
 CROS_MASTER = 'cros/master'
+SCRIPTS_BASH_COMPLETION = 'bash_completion'
 
 
 def _GetDirs(dirs=None):
