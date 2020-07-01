@@ -2,4 +2,3 @@
 export CHROME_ROOT="/tmp/chrome_root"
 export FEATURES="-usersandbox"
 export USE="chrome_internal"
-export PATH=$PATH:~/trunk/goma
