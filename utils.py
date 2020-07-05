@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import re
 import subprocess
 
 def AbsPath(path=''):
@@ -73,6 +74,15 @@ def AssertCWD(paths):
   raise Exception(msg)
 
 
+def SearchFile(filename, search_exp, Process):
+  with open(filename, 'r') as f:
+    for line in f:
+      m = re.search(search_exp, line)
+      if m:
+        Process(m)
+
+
+#TODO: Move somewhere else.
 def GclientSync():
   if IsChrome():
     RunCmd('gclient sync -D -j16', call=True)
