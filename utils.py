@@ -74,7 +74,11 @@ def AssertCWD(paths):
   raise Exception(msg)
 
 
-def SearchFile(filename, search_exp, Process):
+def _PrintMatch(m):
+  print(m.string.rstrip())
+
+
+def SearchFile(filename, search_exp=r'.*', Process=_PrintMatch):
   with open(filename, 'r') as f:
     for line in f:
       m = re.search(search_exp, line)

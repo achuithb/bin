@@ -15,7 +15,7 @@ def Process(m):
 
 
 def Run(filename):
-  utils.SearchFile(filename, r'\((\d+)\)', Process)
+  utils.SearchFile(filename, search_exp=r'\((\d+)\)', Process=Process)
   global total
   print(total)
 
