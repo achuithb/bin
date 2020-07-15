@@ -9,9 +9,10 @@ import utils
 
 DEFAULT_DIR=os.path.join(utils.HOME_DIR, 'Documents', 'etrade')
 FILENAME = 'etrade_{year}.txt'
-SEARCH_EXP = r'^([^\t]+)[\t]+([^\t]+)[\t]([^\t]+)\t([^\t]+)$'
+SEARCH_EXP = r'^([^\t]+)\t([^\t]*)\t([^\t]+)\t([^\t]+)\t([^\t]+)$'
 
 CATEGORIES = {
+    'receipt': 'Check',
     'ATM FEE REFUND' : 'ATM Fee',
     'ATM WITHDRAWAL' : 'ATM Withdrawal',
     'DIRECT DEBIT - CHASE CREDIT CRD,AUTOPAY' : 'Credit card',
@@ -36,9 +37,12 @@ CATEGORIES = {
 category_result = {}
 
 def Process(m):
-  #print(m.string.rstrip())
-  description = m.group(2)
-  value = float(m.group(3).replace(',',''))
+  if m.group(1) == 'Date':
+    return
+
+  # print(m.string.rstrip())
+  description = m.group(2) or m.group(3)
+  value = float(m.group(4).replace(',',''))
 
   global category_result
   found = False
@@ -54,13 +58,20 @@ def Process(m):
 
 
 def Run(filename):
+  entries = 0
   global category_result
   category_result = {key: [0, 0] for key in CATEGORIES.keys()}
   utils.SearchFile(filename, search_exp=SEARCH_EXP, Process=Process)
   for key in category_result.keys():
     name = CATEGORIES[key]
     result = category_result[key]
+    entries += result[0]
     print('%s (instances %d): %.2f' % (name, result[0], result[1]))
+
+  filelen = len(open(filename).readlines())
+  if (filelen - entries) != 1:
+    raise Exception('Unexpected entries: filelen=%d, entries=%d'
+                    % (filelen, entries))
 
 
 def ParseArgs(argv):
