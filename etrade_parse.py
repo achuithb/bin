@@ -21,6 +21,8 @@ class EtradeParser(object):
     self.parsed_results = {}
     self.etrade_file = etrade_file.format(year=year)
     self.etrade_filelen = 0
+    self.beg_balance = 0
+    self.end_balance = 0
     self.categories = self.InitCategories(year)
 
   @classmethod
@@ -67,20 +69,36 @@ class EtradeParser(object):
     return (r'^' + non_tab + tab + opt_non_tab + tab +
             non_tab + tab + non_tab + tab + non_tab + r'$')
 
+  @staticmethod
+  def FromDollar(v):
+    return float(v.replace(',',''))
+
+  @staticmethod
+  def ToDollar(v):
+    sign = ''
+    if v < 0:
+      sign = '-'
+      v = -v
+    return sign + '${:,}'.format(int(v))
+
   def ProcessMatch(self, m):
     if m.group(1) == 'Date':
       return
 
     # print(m.string.rstrip())
     description = m.group(2) or m.group(3)
-    value = float(m.group(4).replace(',',''))
+    amount = self.FromDollar(m.group(4))
+    balance = self.FromDollar(m.group(5))
+    if not self.end_balance:
+      self.end_balance = balance
+    self.beg_balance = balance
 
     found = False
     for category in self.parsed_results.keys():
       if description.find(category) == 0:
         d = self.parsed_results[category]
         d['count'] += 1
-        d['total'] += value
+        d['total'] += amount
         found = True
         break
     if not found:
@@ -120,16 +138,28 @@ class EtradeParser(object):
         res[name]['count'] += count
         res[name]['total'] += total
 
-    self.Print(utils.BLACK, results)
-    print('')
-    self.Print(utils.BLUE, composite_results)
+    self.Print(results, composite_results)
     return entries
 
-  @staticmethod
-  def Print(color, results):
+  @classmethod
+  def PrintResults(cls, color, results):
     for key in sorted(results.keys()):
-      utils.ColorPrint(color, '%s (instances %d): %.2f' %
-                       (key, results[key]['count'], results[key]['total']))
+      utils.ColorPrint(color, '%s (instances %d): %s' %
+                       (key, results[key]['count'],
+                        cls.ToDollar(results[key]['total'])))
+
+  def Print(self, results, composite_results):
+    utils.ColorPrint(utils.GREEN,
+                     'Beginning Balance: %s' % self.ToDollar(self.beg_balance))
+    utils.ColorPrint(utils.GREEN,
+                     'Ending Balance: %s' % self.ToDollar(self.end_balance))
+    utils.ColorPrint(
+        utils.GREEN, 'Difference: %s' %
+        self.ToDollar(self.end_balance - self.beg_balance))
+    print('')
+    self.PrintResults(utils.BLACK, results)
+    print('')
+    self.PrintResults(utils.BLUE, composite_results)
 
   def Verify(self, entries):
     if (self.etrade_filelen - entries) != 1:
