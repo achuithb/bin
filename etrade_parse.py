@@ -20,7 +20,7 @@ class EtradeParser(object):
 
 
   def __init__(self, etrade_file, year):
-    self.category_result = {}
+    self.parsed_results = {}
     self.etrade_file = etrade_file.format(year=year)
     self.categories = self.InitCategories(year)
 
@@ -62,37 +62,54 @@ class EtradeParser(object):
     value = float(m.group(4).replace(',',''))
 
     found = False
-    for category in self.category_result.keys():
+    for category in self.parsed_results.keys():
       if description.find(category) == 0:
-        ary = self.category_result[category]
-        ary[0] += 1
-        ary[1] += value
+        d = self.parsed_results[category]
+        d['count'] += 1
+        d['total'] += value
         found = True
         break
     if not found:
       raise Exception('Unknown description: %s' % description)
 
-  def Run(self):
-    self.category_result = {key: [0, 0] for key in self.categories.keys()}
+  @staticmethod
+  def EmptyResult():
+    return {'count': 0, 'total': 0}
+
+  def Search(self):
+    self.parsed_results = {key: {'count': 0, 'total': 0} for key in self.categories.keys()}
     utils.SearchFile(self.etrade_file, search_exp=self.SearchExpression(),
                      Process=lambda m: self.ProcessMatch(m))
-    entries = self.PrintEntries()
-    self.VerifyEntries(entries)
 
-  def PrintEntries(self):
+  def Print(self):
     entries = 0
-    for key in self.category_result.keys():
-      name = self.categories[key][0]
-      result = self.category_result[key]
-      entries += result[0]
-      print('%s (instances %d): %.2f' % (name, result[0], result[1]))
+    results = {}
+    # print(self.parsed_results)
+    for key in self.parsed_results.keys():
+      d = self.parsed_results[key]
+      count = d['count']
+      total = d['total']
+      for name in self.categories[key]:
+        if not results.has_key(name):
+          results[name] = {'count': 0, 'total': 0}
+        results[name]['count'] += count
+        results[name]['total'] += total
+      entries += count
+    for key in results.keys():
+      print('%s (instances %d): %.2f' %
+            (key, results[key]['count'], results[key]['total']))
     return entries
 
-  def VerifyEntries(self, entries):
+  def Verify(self, entries):
     filelen = len(open(self.etrade_file).readlines())
     if (filelen - entries) != 1:
       raise Exception('Unexpected entries: filelen=%d, entries=%d'
                       % (filelen, entries))
+
+  def Run(self):
+    self.Search()
+    entries = self.Print()
+    self.Verify(entries)
 
   @classmethod
   def ParseArgs(cls, argv):
