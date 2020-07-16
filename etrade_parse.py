@@ -12,11 +12,8 @@ class EtradeParser(object):
   ETRADE_DIR = os.path.join(utils.HOME_DIR, 'Documents', 'etrade')
   ETRADE_FILE = os.path.join(ETRADE_DIR, 'etrade_{year}.txt')
   DEFAULT_YEAR = 2019
-  CATEGORY_DIR = ETRADE_DIR
-  CATEGORY_DIR = os.path.dirname(__file__)
-  OVERRIDE_CATEGORY_FILE = os.path.join(
-      CATEGORY_DIR, 'etrade_categories_{year}.txt')
-  CATEGORY_FILE = os.path.join(CATEGORY_DIR, 'etrade_categories.txt')
+  CATEGORY_FILE = 'etrade_categories.txt'
+  OVERRIDE_CATEGORY_FILE = 'etrade_categories_{year}.txt'
 
 
   def __init__(self, etrade_file, year):
@@ -34,10 +31,24 @@ class EtradeParser(object):
   @classmethod
   def InitCategories(cls, year):
     categories = {}
-    cat_set = set(open(cls.CATEGORY_FILE).readlines())
-    override_category_file = cls.OVERRIDE_CATEGORY_FILE.format(year=year)
-    if os.path.isfile(override_category_file):
-      cat_set.update(open(override_category_file).readlines())
+
+    current_dir = os.path.dirname(__file__)
+    category_path = os.path.join(current_dir, cls.CATEGORY_FILE)
+    if not os.path.isfile(category_path):
+      category_path = os.path.join(cls.ETRADE_DIR, cls.CATEGORY_FILE)
+    if not os.path.isfile(category_path):
+      raise Exception('Could not find category file.')
+    cat_set = set(open(category_path).readlines())
+
+    override_category_filename = cls.OVERRIDE_CATEGORY_FILE.format(year=year)
+    override_category_path = os.path.join(current_dir,
+                                          override_category_filename)
+    if not os.path.isfile(override_category_path):
+      override_category_path = os.path.join(cls.ETRADE_DIR,
+                                            override_category_filename)
+    if os.path.isfile(override_category_path):
+      cat_set.update(open(override_category_path).readlines())
+
     for c in cat_set:
       key, value = c.split(':')
       values = value.split(',')
