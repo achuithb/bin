@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import re
 import sys
 
 import utils
@@ -19,6 +20,7 @@ class EtradeParser(object):
   def __init__(self, etrade_file, year):
     self.parsed_results = {}
     self.etrade_file = etrade_file.format(year=year)
+    self.etrade_filelen = 0
     self.categories = self.InitCategories(year)
 
   @classmethod
@@ -38,6 +40,7 @@ class EtradeParser(object):
       category_path = os.path.join(cls.ETRADE_DIR, cls.CATEGORY_FILE)
     if not os.path.isfile(category_path):
       raise Exception('Could not find category file.')
+
     cat_set = set(open(category_path).readlines())
 
     override_category_filename = cls.OVERRIDE_CATEGORY_FILE.format(year=year)
@@ -89,8 +92,15 @@ class EtradeParser(object):
 
   def Search(self):
     self.parsed_results = {key: self.EmptyResult() for key in self.categories.keys()}
-    utils.SearchFile(self.etrade_file, search_exp=self.SearchExpression(),
-                     Process=lambda m: self.ProcessMatch(m))
+    with open(self.etrade_file, 'r') as f:
+      self.etrade_filelen = 0
+      search_exp = self.SearchExpression()
+      for line in f:
+        self.etrade_filelen += 1
+        m = re.search(search_exp, line)
+        if not m:
+          raise Exception('Failed to parse: %s' % line)
+        self.ProcessMatch(m)
 
   def Process(self):
     entries = 0
@@ -122,8 +132,7 @@ class EtradeParser(object):
                        (key, results[key]['count'], results[key]['total']))
 
   def Verify(self, entries):
-    filelen = len(open(self.etrade_file).readlines())
-    if (filelen - entries) != 1:
+    if (self.etrade_filelen - entries) != 1:
       raise Exception('Unexpected entries: filelen=%d, entries=%d'
                       % (filelen, entries))
 
