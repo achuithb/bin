@@ -12,23 +12,37 @@ class EtradeParser(object):
   ETRADE_DIR = os.path.join(utils.HOME_DIR, 'Documents', 'etrade')
   ETRADE_FILE = os.path.join(ETRADE_DIR, 'etrade_{year}.txt')
   DEFAULT_YEAR = 2019
-  CATEGORY_FILE = os.path.join(ETRADE_DIR, 'etrade_categories.txt')
-  CATEGORY_FILE = os.path.join(
-      os.path.join(os.path.dirname(__file__), 'etrade_categories.txt'))
+  CATEGORY_DIR = ETRADE_DIR
+  CATEGORY_DIR = os.path.dirname(__file__)
+  OVERRIDE_CATEGORY_FILE = os.path.join(
+      CATEGORY_DIR, 'etrade_categories_{year}.txt')
+  CATEGORY_FILE = os.path.join(CATEGORY_DIR, 'etrade_categories.txt')
 
 
-  def __init__(self, category_file, etrade_file):
+  def __init__(self, etrade_file, year):
     self.category_result = {}
-    self.etrade_file = etrade_file
-    self.categories = self.InitCategories(category_file)
+    self.etrade_file = etrade_file.format(year=year)
+    self.categories = self.InitCategories(year)
 
   @classmethod
-  def InitCategories(cls, category_file):
+  def Strip(cls, v):
+    if isinstance(v, list):
+      return [cls.Strip(e) for e in v]
+    else:
+      return v.strip("' \n")
+
+  @classmethod
+  def InitCategories(cls, year):
     categories = {}
-    ary = open(category_file).readlines()
-    for c in ary:
+    cat_set = set(open(cls.CATEGORY_FILE).readlines())
+    override_category_file = cls.OVERRIDE_CATEGORY_FILE.format(year=year)
+    if os.path.isfile(override_category_file):
+      cat_set.update(open(override_category_file).readlines())
+    for c in cat_set:
       key, value = c.split(':')
-      categories[key.strip("' ")] = value.strip("' \n")
+      values = value.split(',')
+      categories[cls.Strip(key)] = cls.Strip(value.split(','))
+    # print(categories)
     return categories
 
   @staticmethod
@@ -68,7 +82,7 @@ class EtradeParser(object):
   def PrintEntries(self):
     entries = 0
     for key in self.category_result.keys():
-      name = self.categories[key]
+      name = self.categories[key][0]
       result = self.category_result[key]
       entries += result[0]
       print('%s (instances %d): %.2f' % (name, result[0], result[1]))
@@ -87,8 +101,6 @@ class EtradeParser(object):
                         help='default %s' % cls.DEFAULT_YEAR)
     parser.add_argument('--file', default=cls.ETRADE_FILE,
                         help='default %s' % cls.ETRADE_FILE)
-    parser.add_argument('--category-file', default=cls.CATEGORY_FILE,
-                        help='default %s' % cls.CATEGORY_FILE)
     return parser.parse_known_args(argv[1:])
 
 
@@ -98,7 +110,7 @@ def main(argv):
   if rem:
     raise Exception('Unknown args: %s' % rem)
 
-  EtradeParser(opts.category_file, opts.file.format(year=opts.year)).Run()
+  EtradeParser(opts.file, opts.year).Run()
 
 
 if __name__ == '__main__':
