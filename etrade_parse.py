@@ -77,28 +77,38 @@ class EtradeParser(object):
     return {'count': 0, 'total': 0}
 
   def Search(self):
-    self.parsed_results = {key: {'count': 0, 'total': 0} for key in self.categories.keys()}
+    self.parsed_results = {key: self.EmptyResult() for key in self.categories.keys()}
     utils.SearchFile(self.etrade_file, search_exp=self.SearchExpression(),
                      Process=lambda m: self.ProcessMatch(m))
 
-  def Print(self):
+  def Process(self):
     entries = 0
     results = {}
+    composite_results = {}
     # print(self.parsed_results)
     for key in self.parsed_results.keys():
       d = self.parsed_results[key]
       count = d['count']
       total = d['total']
-      for name in self.categories[key]:
-        if not results.has_key(name):
-          results[name] = {'count': 0, 'total': 0}
-        results[name]['count'] += count
-        results[name]['total'] += total
       entries += count
-    for key in results.keys():
-      print('%s (instances %d): %.2f' %
-            (key, results[key]['count'], results[key]['total']))
+      for i in range(len(self.categories[key])):
+        name = self.categories[key][i]
+        res = results if i == 0 else composite_results
+        if not res.has_key(name):
+          res[name] = self.EmptyResult()
+        res[name]['count'] += count
+        res[name]['total'] += total
+
+    self.Print(utils.BLACK, results)
+    print('')
+    self.Print(utils.BLUE, composite_results)
     return entries
+
+  @staticmethod
+  def Print(color, results):
+    for key in sorted(results.keys()):
+      utils.ColorPrint(color, '%s (instances %d): %.2f' %
+                       (key, results[key]['count'], results[key]['total']))
 
   def Verify(self, entries):
     filelen = len(open(self.etrade_file).readlines())
@@ -108,7 +118,7 @@ class EtradeParser(object):
 
   def Run(self):
     self.Search()
-    entries = self.Print()
+    entries = self.Process()
     self.Verify(entries)
 
   @classmethod
