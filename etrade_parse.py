@@ -106,7 +106,7 @@ class EtradeParser(object):
         found = True
         break
     if not found:
-      raise Exception('Unknown description: %s' % description)
+      raise Exception('Unknown: %s' % m.string.rstrip())
 
   def Search(self):
     self.parsed_results = {key: self.EmptyResult() for key in self.categories.keys()}
