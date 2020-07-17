@@ -25,12 +25,36 @@ class EtradeParser(object):
     self.end_balance = 0
     self.categories = self.InitCategories(year)
 
+  @staticmethod
+  def EmptyResult():
+    return {'count': 0, 'total': 0}
+
+  @staticmethod
+  def FromDollar(v):
+    return float(v.replace(',',''))
+
+  @staticmethod
+  def ToDollar(v):
+    sign = ''
+    if v < 0:
+      sign = '-'
+      v = -v
+    return sign + '${:,}'.format(int(v))
+
   @classmethod
   def Strip(cls, v):
     if isinstance(v, list):
       return [cls.Strip(e) for e in v]
     else:
       return v.strip("' \n")
+
+  @staticmethod
+  def SearchExpression():
+    non_tab = r'([^\t]+)'
+    opt_non_tab = r'([^\t]*)'
+    tab = r'\t'
+    return (r'^' + non_tab + tab + opt_non_tab + tab +
+            non_tab + tab + non_tab + tab + non_tab + r'$')
 
   @classmethod
   def InitCategories(cls, year):
@@ -61,26 +85,6 @@ class EtradeParser(object):
     # print(categories)
     return categories
 
-  @staticmethod
-  def SearchExpression():
-    non_tab = r'([^\t]+)'
-    opt_non_tab = r'([^\t]*)'
-    tab = r'\t'
-    return (r'^' + non_tab + tab + opt_non_tab + tab +
-            non_tab + tab + non_tab + tab + non_tab + r'$')
-
-  @staticmethod
-  def FromDollar(v):
-    return float(v.replace(',',''))
-
-  @staticmethod
-  def ToDollar(v):
-    sign = ''
-    if v < 0:
-      sign = '-'
-      v = -v
-    return sign + '${:,}'.format(int(v))
-
   def ProcessMatch(self, m):
     if m.group(1) == 'Date':
       return
@@ -95,7 +99,7 @@ class EtradeParser(object):
 
     found = False
     for category in self.parsed_results.keys():
-      if description.find(category) == 0:
+      if re.search(category, description):
         d = self.parsed_results[category]
         d['count'] += 1
         d['total'] += amount
@@ -103,10 +107,6 @@ class EtradeParser(object):
         break
     if not found:
       raise Exception('Unknown description: %s' % description)
-
-  @staticmethod
-  def EmptyResult():
-    return {'count': 0, 'total': 0}
 
   def Search(self):
     self.parsed_results = {key: self.EmptyResult() for key in self.categories.keys()}
