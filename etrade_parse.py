@@ -26,6 +26,7 @@ class EtradeParser(object):
     self.end_balance = 0
     self.categories = {}
     self.parsed_results = {}
+    self.categories_set = set()
 
   @staticmethod
   def EmptyResult():
@@ -66,9 +67,9 @@ class EtradeParser(object):
       for line in f:
         filelen += 1
         m = re.search(search_exp, line)
-        if not m:
-          raise Exception('Failed to parse: %s' % line)
-        ProcessMatch(m)
+        if m:
+          ProcessMatch(m)
+        # raise Exception('Failed to parse: %s' % line)
       return filelen
 
   def InitCategories(self):
@@ -177,12 +178,22 @@ class EtradeParser(object):
     entries = self.Process()
     self.Verify(filelen, entries)
 
+  def ListMatch(self, m):
+    if m.group(1) == 'Date':
+      return
+
+    # print(m.string.rstrip())
+    description = m.group(2) or m.group(3)
+    self.categories_set.add(description)
+
   def List(self):
     ls = utils.RunCmd('ls %s' % self.ETRADE_DIR, silent=True)
     etrade_files = [e for e in ls.rstrip().split('\n')
                     if e != self.CATEGORY_FILE]
     for etrade_file in etrade_files:
-      print etrade_file
+      self.Search(os.path.join(self.ETRADE_DIR, etrade_file),
+                  lambda m: self.ListMatch(m))
+    print('\n'.join(sorted(self.categories_set)))
 
   @classmethod
   def ParseArgs(cls, argv):
