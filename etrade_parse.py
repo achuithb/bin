@@ -19,11 +19,13 @@ class EtradeParser(object):
 
   def __init__(self, etrade_file, year):
     self.parsed_results = {}
+    self.year = year
     self.etrade_file = etrade_file.format(year=year)
     self.etrade_filelen = 0
     self.beg_balance = 0
     self.end_balance = 0
-    self.categories = self.InitCategories(year)
+    self.categories = {}
+    self.parsed_results = {}
 
   @staticmethod
   def EmptyResult():
@@ -57,23 +59,36 @@ class EtradeParser(object):
             non_tab + tab + non_tab + tab + non_tab + r'$')
 
   @classmethod
-  def InitCategories(cls, year):
+  def Search(cls, etrade_file, ProcessMatch):
+    with open(etrade_file, 'r') as f:
+      filelen = 0
+      search_exp = cls.SearchExpression()
+      for line in f:
+        filelen += 1
+        m = re.search(search_exp, line)
+        if not m:
+          raise Exception('Failed to parse: %s' % line)
+        ProcessMatch(m)
+      return filelen
+
+  def InitCategories(self):
     categories = {}
 
     current_dir = os.path.dirname(__file__)
-    category_path = os.path.join(current_dir, cls.CATEGORY_FILE)
+    category_path = os.path.join(current_dir, self.CATEGORY_FILE)
     if not os.path.isfile(category_path):
-      category_path = os.path.join(cls.ETRADE_DIR, cls.CATEGORY_FILE)
+      category_path = os.path.join(self.ETRADE_DIR, self.CATEGORY_FILE)
     if not os.path.isfile(category_path):
       raise Exception('Could not find category file.')
 
     cat_set = set(open(category_path).readlines())
 
-    override_category_filename = cls.OVERRIDE_CATEGORY_FILE.format(year=year)
+    override_category_filename = self.OVERRIDE_CATEGORY_FILE.format(
+        year=self.year)
     override_category_path = os.path.join(current_dir,
                                           override_category_filename)
     if not os.path.isfile(override_category_path):
-      override_category_path = os.path.join(cls.ETRADE_DIR,
+      override_category_path = os.path.join(self.ETRADE_DIR,
                                             override_category_filename)
     if os.path.isfile(override_category_path):
       cat_set.update(open(override_category_path).readlines())
@@ -81,9 +96,11 @@ class EtradeParser(object):
     for c in cat_set:
       key, value = c.split(':')
       values = value.split(',')
-      categories[cls.Strip(key)] = cls.Strip(value.split(','))
+      categories[self.Strip(key)] = self.Strip(value.split(','))
     # print(categories)
-    return categories
+
+    self.categories = categories
+    self.parsed_results = {key: self.EmptyResult() for key in self.categories.keys()}
 
   def ProcessMatch(self, m):
     if m.group(1) == 'Date':
@@ -107,18 +124,6 @@ class EtradeParser(object):
         break
     if not found:
       raise Exception('Unknown: %s' % m.string.rstrip())
-
-  def Search(self):
-    self.parsed_results = {key: self.EmptyResult() for key in self.categories.keys()}
-    with open(self.etrade_file, 'r') as f:
-      self.etrade_filelen = 0
-      search_exp = self.SearchExpression()
-      for line in f:
-        self.etrade_filelen += 1
-        m = re.search(search_exp, line)
-        if not m:
-          raise Exception('Failed to parse: %s' % line)
-        self.ProcessMatch(m)
 
   def Process(self):
     entries = 0
@@ -161,15 +166,23 @@ class EtradeParser(object):
     print('')
     self.PrintResults(utils.BLUE, composite_results)
 
-  def Verify(self, entries):
-    if (self.etrade_filelen - entries) != 1:
+  def Verify(self, filelen, entries):
+    if (filelen - entries) != 1:
       raise Exception('Unexpected entries: filelen=%d, entries=%d'
                       % (filelen, entries))
 
   def Run(self):
-    self.Search()
+    self.InitCategories()
+    filelen = self.Search(self.etrade_file, lambda m: self.ProcessMatch(m))
     entries = self.Process()
-    self.Verify(entries)
+    self.Verify(filelen, entries)
+
+  def List(self):
+    ls = utils.RunCmd('ls %s' % self.ETRADE_DIR, silent=True)
+    etrade_files = [e for e in ls.rstrip().split('\n')
+                    if e != self.CATEGORY_FILE]
+    for etrade_file in etrade_files:
+      print etrade_file
 
   @classmethod
   def ParseArgs(cls, argv):
@@ -178,6 +191,8 @@ class EtradeParser(object):
                         help='default %s' % cls.DEFAULT_YEAR)
     parser.add_argument('--file', default=cls.ETRADE_FILE,
                         help='default %s' % cls.ETRADE_FILE)
+    parser.add_argument('--list', default=False, action='store_true',
+                        help='List Descriptions')
     return parser.parse_known_args(argv[1:])
 
 
@@ -187,7 +202,11 @@ def main(argv):
   if rem:
     raise Exception('Unknown args: %s' % rem)
 
-  EtradeParser(opts.file, opts.year).Run()
+  etrade_parser = EtradeParser(opts.file, opts.year)
+  if opts.list:
+    etrade_parser.List()
+  else:
+    etrade_parser.Run()
 
 
 if __name__ == '__main__':
