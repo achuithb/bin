@@ -12,6 +12,7 @@ class EtradeParser(object):
 
   ETRADE_DIR = os.path.join(utils.HOME_DIR, 'Documents', 'etrade')
   ETRADE_FILE = os.path.join(ETRADE_DIR, 'etrade_{year}.txt')
+  ETRADE_FILE_REGEXP = r'etrade_[\d]+.txt'
   DEFAULT_YEAR = 2019
   CATEGORY_FILE = 'etrade_categories.txt'
   OVERRIDE_CATEGORY_FILE = 'etrade_categories_{year}.txt'
@@ -59,16 +60,21 @@ class EtradeParser(object):
     return (r'^' + non_tab + tab + opt_non_tab + tab +
             non_tab + tab + non_tab + tab + non_tab + r'$')
 
-  @classmethod
-  def Search(cls, etrade_file, ProcessMatch):
+  def Search(self, etrade_file, categorize):
     with open(etrade_file, 'r') as f:
       filelen = 0
-      search_exp = cls.SearchExpression()
+      search_exp = self.SearchExpression()
       for line in f:
         filelen += 1
         m = re.search(search_exp, line)
-        if m:
-          ProcessMatch(m)
+        if m and m.group(1) != 'Date':
+          match_str = m.string.rstrip()
+          # print(match_str)
+          description = m.group(2) or m.group(3)
+          amount = self.FromDollar(m.group(4))
+          balance = self.FromDollar(m.group(5))
+          ProcessMatch = self.Categorize if categorize else self.ProcessList
+          ProcessMatch(match_str, description, amount, balance)
         # raise Exception('Failed to parse: %s' % line)
       return filelen
 
@@ -103,14 +109,7 @@ class EtradeParser(object):
     self.categories = categories
     self.parsed_results = {key: self.EmptyResult() for key in self.categories.keys()}
 
-  def ProcessMatch(self, m):
-    if m.group(1) == 'Date':
-      return
-
-    # print(m.string.rstrip())
-    description = m.group(2) or m.group(3)
-    amount = self.FromDollar(m.group(4))
-    balance = self.FromDollar(m.group(5))
+  def Categorize(self, match_str, description, amount, balance):
     if not self.end_balance:
       self.end_balance = balance
     self.beg_balance = balance
@@ -124,7 +123,7 @@ class EtradeParser(object):
         found = True
         break
     if not found:
-      raise Exception('Unknown: %s' % m.string.rstrip())
+      raise Exception('Unknown: %s' % match_str)
 
   def Process(self):
     entries = 0
@@ -174,25 +173,19 @@ class EtradeParser(object):
 
   def Run(self):
     self.InitCategories()
-    filelen = self.Search(self.etrade_file, lambda m: self.ProcessMatch(m))
+    filelen = self.Search(self.etrade_file, True)
     entries = self.Process()
     self.Verify(filelen, entries)
 
-  def ListMatch(self, m):
-    if m.group(1) == 'Date':
-      return
-
-    # print(m.string.rstrip())
-    description = m.group(2) or m.group(3)
+  def ProcessList(self, match_str, description, amount, balance):
     self.categories_set.add(description)
 
   def List(self):
     ls = utils.RunCmd('ls %s' % self.ETRADE_DIR, silent=True)
     etrade_files = [e for e in ls.rstrip().split('\n')
-                    if e != self.CATEGORY_FILE]
+                    if re.search(self.ETRADE_FILE_REGEXP, e)]
     for etrade_file in etrade_files:
-      self.Search(os.path.join(self.ETRADE_DIR, etrade_file),
-                  lambda m: self.ListMatch(m))
+      self.Search(os.path.join(self.ETRADE_DIR, etrade_file), False)
     print('\n'.join(sorted(self.categories_set)))
 
   @classmethod
