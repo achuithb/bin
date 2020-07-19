@@ -15,6 +15,7 @@ class EtradeParser(object):
   ETRADE_FILE_REGEXP = r'etrade_[\d]+.txt'
   DEFAULT_YEAR = 2019
   CATEGORY_FILE = 'etrade_categories.txt'
+  CATEGORY_LIST = 'category_list.txt'
   OVERRIDE_CATEGORY_FILE = 'etrade_categories_{year}.txt'
   MIN_AMOUNT = 0
 
@@ -29,6 +30,7 @@ class EtradeParser(object):
     self.categories = {}
     self.parsed_results = {}
     self.all_categories = {}
+    self.category_list = []
 
     self.InitCategories()
 
@@ -181,7 +183,7 @@ class EtradeParser(object):
 
   def CreateCategories(self, match_str, description, amount, balance):
     # Skip match if it already exists.
-    for exp in self.categories.keys():
+    for exp in self.category_list:
       if re.search(exp, description):
         return
     c = self.all_categories
@@ -191,6 +193,9 @@ class EtradeParser(object):
     c[description]['total'] += amount
 
   def List(self, list_long):
+    self.category_list = [e.rstrip('\n') for e in (
+        open(os.path.join(self.ETRADE_DIR, self.CATEGORY_LIST)).readlines())]
+    # print '\'\n\''.join(self.category_list)
     ls = utils.RunCmd('ls %s' % self.ETRADE_DIR, silent=True)
     etrade_files = [e for e in ls.rstrip().split('\n')
                     if re.search(self.ETRADE_FILE_REGEXP, e)]
