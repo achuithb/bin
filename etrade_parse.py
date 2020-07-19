@@ -16,6 +16,7 @@ class EtradeParser(object):
   DEFAULT_YEAR = 2019
   CATEGORY_FILE = 'etrade_categories.txt'
   OVERRIDE_CATEGORY_FILE = 'etrade_categories_{year}.txt'
+  MIN_AMOUNT = 0
 
 
   def __init__(self, etrade_file, year):
@@ -27,7 +28,9 @@ class EtradeParser(object):
     self.end_balance = 0
     self.categories = {}
     self.parsed_results = {}
-    self.categories_set = set()
+    self.all_categories = {}
+
+    self.InitCategories()
 
   @staticmethod
   def EmptyResult():
@@ -60,22 +63,22 @@ class EtradeParser(object):
     return (r'^' + non_tab + tab + opt_non_tab + tab +
             non_tab + tab + non_tab + tab + non_tab + r'$')
 
-  def Search(self, etrade_file, categorize):
+  @classmethod
+  def Search(cls, etrade_file, ProcessMatch):
     with open(etrade_file, 'r') as f:
       filelen = 0
-      search_exp = self.SearchExpression()
+      search_exp = cls.SearchExpression()
       for line in f:
         filelen += 1
         m = re.search(search_exp, line)
+        # if not m: raise Exception('Failed to parse: %s' % line)
         if m and m.group(1) != 'Date':
           match_str = m.string.rstrip()
           # print(match_str)
           description = m.group(2) or m.group(3)
-          amount = self.FromDollar(m.group(4))
-          balance = self.FromDollar(m.group(5))
-          ProcessMatch = self.Categorize if categorize else self.ProcessList
+          amount = cls.FromDollar(m.group(4))
+          balance = cls.FromDollar(m.group(5))
           ProcessMatch(match_str, description, amount, balance)
-        # raise Exception('Failed to parse: %s' % line)
       return filelen
 
   def InitCategories(self):
@@ -109,7 +112,7 @@ class EtradeParser(object):
     self.categories = categories
     self.parsed_results = {key: self.EmptyResult() for key in self.categories.keys()}
 
-  def Categorize(self, match_str, description, amount, balance):
+  def CategorizeMatch(self, match_str, description, amount, balance):
     if not self.end_balance:
       self.end_balance = balance
     self.beg_balance = balance
@@ -125,7 +128,7 @@ class EtradeParser(object):
     if not found:
       raise Exception('Unknown: %s' % match_str)
 
-  def Process(self):
+  def Categorize(self):
     entries = 0
     results = {}
     composite_results = {}
@@ -172,21 +175,37 @@ class EtradeParser(object):
                       % (filelen, entries))
 
   def Run(self):
-    self.InitCategories()
-    filelen = self.Search(self.etrade_file, True)
-    entries = self.Process()
+    filelen = self.Search(self.etrade_file, self.CategorizeMatch)
+    entries = self.Categorize()
     self.Verify(filelen, entries)
 
-  def ProcessList(self, match_str, description, amount, balance):
-    self.categories_set.add(description)
+  def CreateCategories(self, match_str, description, amount, balance):
+    # Skip match if it already exists.
+    for exp in self.categories.keys():
+      if re.search(exp, description):
+        return
+    c = self.all_categories
+    if not c.has_key(description):
+      c[description] = self.EmptyResult()
+    c[description]['count'] += 1
+    c[description]['total'] += amount
 
-  def List(self):
+  def List(self, list_long):
     ls = utils.RunCmd('ls %s' % self.ETRADE_DIR, silent=True)
     etrade_files = [e for e in ls.rstrip().split('\n')
                     if re.search(self.ETRADE_FILE_REGEXP, e)]
     for etrade_file in etrade_files:
-      self.Search(os.path.join(self.ETRADE_DIR, etrade_file), False)
-    print('\n'.join(sorted(self.categories_set)))
+      self.Search(os.path.join(self.ETRADE_DIR, etrade_file),
+                  self.CreateCategories)
+    c = self.all_categories
+    for desc in sorted(c.keys()):
+      count = c[desc]['count']
+      amount = c[desc]['total']
+      if abs(amount) > self.MIN_AMOUNT:
+        if list_long:
+          print('%s\t%d\t%d' % (desc, count, amount))
+        else:
+          print(desc)
 
   @classmethod
   def ParseArgs(cls, argv):
@@ -197,6 +216,8 @@ class EtradeParser(object):
                         help='default %s' % cls.ETRADE_FILE)
     parser.add_argument('--list', default=False, action='store_true',
                         help='List Descriptions')
+    parser.add_argument('--list-long', default=False, action='store_true',
+                        help='List Descriptions with Count and Amount')
     return parser.parse_known_args(argv[1:])
 
 
@@ -207,8 +228,8 @@ def main(argv):
     raise Exception('Unknown args: %s' % rem)
 
   etrade_parser = EtradeParser(opts.file, opts.year)
-  if opts.list:
-    etrade_parser.List()
+  if opts.list or opts.list_long:
+    etrade_parser.List(opts.list_long)
   else:
     etrade_parser.Run()
 
