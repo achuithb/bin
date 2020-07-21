@@ -17,19 +17,19 @@ class EtradeParser(object):
   CATEGORY_FILE = 'etrade_categories.txt'
   CATEGORY_LIST = 'category_list.txt'
   OVERRIDE_CATEGORY_FILE = 'etrade_categories_{year}.txt'
-  MIN_AMOUNT = 0
 
 
-  def __init__(self, etrade_file, year):
-    self.parsed_results = {}
+  def __init__(self, etrade_file, year, list_known, min_amount, max_amount):
     self.year = year
+    self.list_known = list_known
     self.etrade_file = etrade_file.format(year=year)
     self.etrade_filelen = 0
+    self.min_amount = min_amount
+    self.max_amount = max_amount
     self.beg_balance = 0
     self.end_balance = 0
     self.categories = {}
-    self.parsed_results = {}
-    self.all_categories = {}
+    self.results = {}
     self.category_list = []
 
     self.InitCategories()
@@ -112,7 +112,7 @@ class EtradeParser(object):
     # print(categories)
 
     self.categories = categories
-    self.parsed_results = {key: self.EmptyResult() for key in self.categories.keys()}
+    self.results = {key: self.EmptyResult() for key in self.categories.keys()}
 
   def CategorizeMatch(self, match_str, description, amount, balance):
     if not self.end_balance:
@@ -120,23 +120,23 @@ class EtradeParser(object):
     self.beg_balance = balance
 
     found = False
-    for category in self.parsed_results.keys():
+    for category in self.results.keys():
       if re.search(category, description):
-        d = self.parsed_results[category]
+        d = self.results[category]
         d['count'] += 1
         d['total'] += amount
         found = True
         break
     if not found:
-      raise Exception('Unknown: %s' % match_str)
+      utils.ColorPrint(utils.RED, 'Unknown: %s' % match_str)
 
   def Categorize(self):
     entries = 0
     results = {}
     composite_results = {}
-    # print(self.parsed_results)
-    for key in self.parsed_results.keys():
-      d = self.parsed_results[key]
+    # print(self.results)
+    for key in self.results.keys():
+      d = self.results[key]
       count = d['count']
       total = d['total']
       entries += count
@@ -186,28 +186,50 @@ class EtradeParser(object):
     for exp in self.category_list:
       if re.search(exp, description):
         return
-    c = self.all_categories
+    c = self.results
     if not c.has_key(description):
       c[description] = self.EmptyResult()
     c[description]['count'] += 1
     c[description]['total'] += amount
 
+  @classmethod
+  def FileList(cls):
+    ls = utils.RunCmd('ls %s' % cls.ETRADE_DIR, silent=True)
+    return [e for e in ls.rstrip().split('\n')
+            if re.search(cls.ETRADE_FILE_REGEXP, e)]
+
+  @classmethod
+  def InitCategoryList(cls):
+    cat_path = os.path.join(cls.ETRADE_DIR, cls.CATEGORY_LIST)
+    if os.path.isfile(cat_path):
+      return [e.rstrip('\n') for e in open(cat_path).readlines()]
+    return []
+
+  def CheckAmount(self, amount):
+    amount = abs(amount)
+    if self.min_amount and amount < self.min_amount:
+      return False
+    if self.max_amount and amount > self.max_amount:
+      return False
+    return True
+
   def List(self, list_long):
-    self.category_list = [e.rstrip('\n') for e in (
-        open(os.path.join(self.ETRADE_DIR, self.CATEGORY_LIST)).readlines())]
+    self.category_list = self.InitCategoryList()
+    self.results = {key: self.EmptyResult() for key in self.category_list}
     # print '\'\n\''.join(self.category_list)
-    ls = utils.RunCmd('ls %s' % self.ETRADE_DIR, silent=True)
-    etrade_files = [e for e in ls.rstrip().split('\n')
-                    if re.search(self.ETRADE_FILE_REGEXP, e)]
+    etrade_files = self.FileList()
+
+    ProcessMatch = (self.CategorizeMatch if self.list_known
+                    else self.CreateCategories)
     for etrade_file in etrade_files:
-      self.Search(os.path.join(self.ETRADE_DIR, etrade_file),
-                  self.CreateCategories)
-    c = self.all_categories
+      self.Search(os.path.join(self.ETRADE_DIR, etrade_file), ProcessMatch)
+
+    c = self.results
     for desc in sorted(c.keys()):
       count = c[desc]['count']
       amount = c[desc]['total']
-      if abs(amount) > self.MIN_AMOUNT:
-        if list_long:
+      if self.CheckAmount(amount):
+        if list_long or self.list_known:
           print('%s\t%d\t%d' % (desc, count, amount))
         else:
           print(desc)
@@ -220,9 +242,13 @@ class EtradeParser(object):
     parser.add_argument('--file', default=cls.ETRADE_FILE,
                         help='default %s' % cls.ETRADE_FILE)
     parser.add_argument('--list', default=False, action='store_true',
-                        help='List Descriptions')
+                        help='List Unknown Descriptions')
     parser.add_argument('--list-long', default=False, action='store_true',
-                        help='List Descriptions with Count and Amount')
+                        help='List Unknown Descriptions with Count and Amount')
+    parser.add_argument('--list-known', default=False, action='store_true',
+                        help='List Known Descriptions with Count and Amount')
+    parser.add_argument('--min-amount', default=None, help='Minimum Amount')
+    parser.add_argument('--max-amount', default=None, help='Maximum Amount')
     return parser.parse_known_args(argv[1:])
 
 
@@ -232,8 +258,9 @@ def main(argv):
   if rem:
     raise Exception('Unknown args: %s' % rem)
 
-  etrade_parser = EtradeParser(opts.file, opts.year)
-  if opts.list or opts.list_long:
+  etrade_parser = EtradeParser(opts.file, opts.year, opts.list_known,
+                               opts.min_amount, opts.max_amount)
+  if opts.list or opts.list_long or opts.list_known:
     etrade_parser.List(opts.list_long)
   else:
     etrade_parser.Run()
