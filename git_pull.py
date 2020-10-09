@@ -14,7 +14,7 @@ import utils
 def CheckoutMaster():
   if utils.IsCrOS():
     cros_utils.CheckoutCrosMaster()
-  else:
+  elif not utils.IsAndroid():
     if utils.IsChrome():
       os.chdir(chromite_setup.CHROME_DIR)
       if not git_lib.DetachedHead():
@@ -24,7 +24,7 @@ def CheckoutMaster():
 
 
 def Pull():
-  if utils.IsCrOS():
+  if utils.IsCrOS() or utils.IsAndroid():
     utils.RunCmd('repo sync', call=True)
   else:
     git_lib.GitPull()
@@ -37,7 +37,7 @@ def Sync():
 def Rebase():
   if utils.IsCrOS():
     cros_utils.RepoRebase()
-  else:
+  elif not utils.IsAndroid():
     git_lib.GitRebaseAll()
 
 

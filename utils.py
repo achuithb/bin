@@ -10,9 +10,10 @@ def AbsPath(path=''):
 HOME_DIR = AbsPath()
 CODE_DIR = AbsPath('code')
 BIN_DIR = AbsPath('code/bin')
-CATAPULT_DIR = AbsPath('code/catapult')
-CHROME_DIR = AbsPath('code/chrome/src')
 CROS_DIR = AbsPath('code/cros')
+CHROME_DIR = AbsPath('code/chrome/src')
+CATAPULT_DIR = AbsPath('code/catapult')
+ANDROID_DIR = AbsPath('code/android')
 
 dry_run = False
 
@@ -55,6 +56,9 @@ def IsChrome(root=False):
 
 def IsCatapult(root=False):
   return _IsPlatform(CATPULT_DIR, root)
+
+def IsAndroid(root=False):
+  return _IsPlatform(ANDROID_DIR, root)
 
 
 def AssertCWD(paths):
