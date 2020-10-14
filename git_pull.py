@@ -24,6 +24,8 @@ def CheckoutMaster():
 
 
 def Pull():
+  if utils.IsAndroid():
+    utils.RunCmd('gcert', '-reuse_sso_cookie')
   if utils.IsCrOS() or utils.IsAndroid():
     utils.RunCmd('repo sync', call=True)
   else:
