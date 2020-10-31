@@ -174,7 +174,9 @@ def GitRebaseAll(skip_list=None):
   committed = []
   branches = GitListBranches()
   for branch in branches:
-    if branch not in skip_list:
+    if branch.find('branch_') == 0 or branch in skip_list:
+      utils.ColorPrint(utils.BLACK, 'Skipping %r' % branch)
+    else:
       GitRebase(branch, unrebased, committed)
   if MASTER in branches:
     GitCheckout(MASTER)
