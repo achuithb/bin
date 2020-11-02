@@ -25,7 +25,11 @@ def ColorPrint(color, text):
   print(color + text + reset)
 
 
-def RunCmd(args, call=False, silent=False, dry_run=dry_run):
+def RunCmd(args, call=False, silent=False, dryrun=None):
+  if dryrun is None:
+    global dry_run
+    dryrun = dry_run
+
   if isinstance(args, str):
     args = args.split()
   if not isinstance(args, list):
@@ -33,7 +37,7 @@ def RunCmd(args, call=False, silent=False, dry_run=dry_run):
 
   if not silent:
     ColorPrint(CYAN, 'RunCmd: %s' % (' ').join(args))
-  if dry_run:
+  if dryrun:
     return 0
   if call:
     ret = subprocess.call(args)
