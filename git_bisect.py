@@ -14,7 +14,7 @@ def CreateBranch(index):
   # format: commit <hash>
   _, commit = lines[index].split()
 
-  git_lib.GitCreateBranch('bisect_%d' % index, commit)
+  git_lib.GitCreateBranch('bisect_%d' % index, commit=commit)
   utils.GclientSync()
 
 

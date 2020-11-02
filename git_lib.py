@@ -89,11 +89,8 @@ def GitRebase(branch, unrebased, committed):
     committed.append(branch)
 
 
-def GitCreateBranch(new_branch, commit=None):
-  cmd = 'git checkout -b %s' % new_branch
-  if commit:
-    cmd += ' ' + commit
-  utils.RunCmd(cmd)
+def GitCreateBranch(new_branch, commit=''):
+  utils.RunCmd('git checkout -b %s %s' % (new_branch, commit))
 
 
 def GitDeleteBranch(branch):
@@ -184,3 +181,16 @@ def GitRebaseAll(skip_list=None):
     utils.ColorPrint(utils.RED, 'Unrebased branches: %r' % unrebased)
   if committed:
     utils.ColorPrint(utils.GREEN, 'Fully committed branches: %r' % committed)
+
+def CheckoutRelease(branch, force):
+  branch_name = 'branch_' + branch
+  remote_branch = 'branch-heads/%s' % branch
+
+  if branch_name in GitListBranches():
+    if not force:
+      raise Exception('branch %s exists; use --force to override.'
+                      % branch_name)
+    else:
+      GitDeleteBranch(branch_name)
+  GitCreateBranch(branch_name, remote_branch)
+  GitSetUpstream(remote_branch)
