@@ -94,6 +94,23 @@ def SearchFile(filename, search_exp=r'.*', Process=_PrintMatch):
         Process(m)
 
 
+def ParseArgs(parser, argv, raise_on_rem=True):
+  parser.add_argument('--dry-run', action='store_true', default=False,
+                      help='Dry run')
+  opts, rem = parser.parse_known_args(argv[1:])
+
+  if rem and raise_on_rem:
+    raise Exception('Unknown args: %s' % rem)
+  if opts.dry_run:
+    global dry_run
+    dry_run = True
+
+  if raise_on_rem:
+    return opts
+  else:
+    return opts, rem
+
+
 #TODO: Move somewhere else.
 def GclientSync():
   if IsChrome():
