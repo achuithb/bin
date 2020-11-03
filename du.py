@@ -93,7 +93,7 @@ def ParseArgs(argv):
   parser.add_argument('--depth', type=int, default=7, help='default depth')
   parser.add_argument('--cache-depth', type=int, default=4, help='cache depth')
   parser.add_argument('--size', type=int, default=10, help='size cutoff in GB')
-  return parser.parse_known_args(argv[1:])
+  return utils.ParseArgs(parser, argv, allow_rem=True)
 
 
 def main(argv):
