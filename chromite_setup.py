@@ -24,15 +24,20 @@ def RemoveFile(filename):
     pass
 
 
-def CreateLink(filename, copy):
-  source = os.path.join(CROS_DIR, filename)
-  dest = os.path.join(CHROME_DIR, filename)
-  RemoveFile(dest)
+def LinkOrCopy(source, dest, copy):
   if copy:
     shutil.copyfile(source, dest)
   else:
     os.symlink(source, dest)
+
+
+def CreateLink(filename, copy):
+  source = os.path.join(CROS_DIR, filename)
+  dest = os.path.join(CHROME_DIR, filename)
+  RemoveFile(dest)
+  LinkOrCopy(source, dest, copy)
   git_lib.GitAddFile(dest)
+
 
 def Create(copy):
   git_lib.AssertDetachedHead()
@@ -71,14 +76,11 @@ def ParseArgs(argv):
                       help='delete chromite links')
   parser.add_argument('--copy', action='store_true', default=False,
                       help='copy instead of linking')
-  return parser.parse_known_args(argv[1:])
+  return utils.ParseArgs(parser, argv)
 
 
 def main(argv):
-  opts, rem = ParseArgs(argv)
-
-  if rem:
-    raise Exception('Unknown args: %s' % rem)
+  opts = ParseArgs(argv)
   Run(opts.create, opts.delete, opts.copy)
 
 
