@@ -94,21 +94,21 @@ def SearchFile(filename, search_exp=r'.*', Process=_PrintMatch):
         Process(m)
 
 
-def ParseArgs(parser, argv, raise_on_rem=True):
+def ParseArgs(parser, argv, allow_rem=False):
   parser.add_argument('--dry-run', action='store_true', default=False,
                       help='Dry run')
   opts, rem = parser.parse_known_args(argv[1:])
 
-  if rem and raise_on_rem:
+  if rem and not allow_rem:
     raise Exception('Unknown args: %s' % rem)
   if opts.dry_run:
     global dry_run
     dry_run = True
 
-  if raise_on_rem:
-    return opts
-  else:
+  if allow_rem:
     return opts, rem
+  else:
+    return opts
 
 
 #TODO: Move somewhere else.

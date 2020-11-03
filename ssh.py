@@ -23,7 +23,7 @@ def Deploy(opts, host):
   else:
     cmd += ['--to=%s' % host]
 
-  utils.RunCmd(cmd, call=True, dry_run=opts.dry_run)
+  utils.RunCmd(cmd, call=True)
 
 def ForwardPorts(opts):
   forward_port = None
@@ -58,10 +58,10 @@ def Remote(opts, host, src, dest):
     remote += ':' + dest
   cmd += [remote]
 
-  utils.RunCmd(cmd, call=True, dry_run=opts.dry_run)
+  utils.RunCmd(cmd, call=True)
 
 
-def ParseArgs(argv):
+def CreateParser():
   parser = argparse.ArgumentParser('Script for SSH/SCP/Deploy')
   parser.add_argument('--forward-port', '-L', type=int, help='Port to forward')
   parser.add_argument('--remote-port-forward', '-R', type=int,
@@ -78,13 +78,12 @@ def ParseArgs(argv):
                       help='deploy_chrome instead of SSH')
   parser.add_argument('--nostrip', action='store_true', default=False,
                       help='use nostrip with deploy_chrome')
-  parser.add_argument('--dry-run', action='store_true', default=False,
-                      help='dry run')
-  return parser.parse_known_args(argv[1:])
+  return parser
 
 
 def main(argv):
-  opts, rem = ParseArgs(argv)
+  opts, rem = utils.ParseArgs(CreateParser(), argv, allow_rem=True)
+
   src = None
   dest = None
   host = constants.DEVICE_IP
