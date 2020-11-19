@@ -6,18 +6,19 @@ import sys
 import utils
 
 
+def Script(opts):
+  pass
+
+
 def ParseArgs(argv):
   parser = argparse.ArgumentParser('Script')
-  parser.add_argument('--dry-run', action='store_true', default=False,
-                      help='dry run')
-  return parser.parse_known_args(argv[1:])
+  return utils.ParseArgs(parser, argv)
 
 
 def main(argv):
-  opts, rem = ParseArgs(argv)
+  opts = ParseArgs(argv)
+  Script(opts)
 
-  if rem:
-    raise Exception('Unknown args: %s' % rem)
 
 if __name__ == '__main__':
   sys.exit(main(sys.argv))
