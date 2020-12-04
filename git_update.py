@@ -15,7 +15,7 @@ def Update():
     return
 
   if not utils.IsCrOS():
-    git_lib.GitSetUpstream(git_lib.MASTER)
+    git_lib.GitCheckUpstream()
   git_lib.GitCommitFixup()
   git_lib.GitAutoSquash()
 
