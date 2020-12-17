@@ -66,6 +66,10 @@ def AssertDetachedHead():
     raise Exception('Not in detached head state.')
 
 
+def GitSetUpstream(branch):
+  utils.RunCmd('git branch --set-upstream-to=%s' % branch)
+
+
 def GitCheckUpstream():
   pass
 
