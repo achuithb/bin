@@ -12,7 +12,7 @@ def RepoUpload(verify):
   utils.RunCmd(cmd, call=True)
 
 
-def Upload(verify, upstream):
+def Upload(verify):
   if utils.IsCrOS():
     RepoUpload(verify)
   else:
@@ -30,7 +30,7 @@ def ParseArgs(argv):
 def main(argv):
   utils.AssertCWD([utils.CROS_DIR, utils.CHROME_DIR, utils.CATAPULT_DIR])
   opts = ParseArgs(argv)
-  Upload(opts.verify, opts.upstream)
+  Upload(opts.verify)
 
 if __name__ == '__main__':
   sys.exit(main(sys.argv))
