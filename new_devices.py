@@ -55,6 +55,13 @@ NEW_DEVICES = [
   'willow',
 ]
 
+HERO_DEVICES = [
+  'lazor',    'ezkinil', 'voxel',     'drobit', 'delbin', 'woomax',
+  'eldrid',   'coachZ',  'marzipan',  'dooly',  'delphi', 'homestar',
+  'lillipup', 'lindar',  'nightfury', 'kenzo',  'vilboz', 'noibat',
+  'morphius', 'jinlon',  'bonjovi',   'copano', 'madoo',
+]
+
 EXISTING_DEVICES = [
   'akali',
   'akali360',
@@ -292,7 +299,7 @@ EXISTING_DEVICES = [
 ]
 
 def Devices(opts):
-  for device in NEW_DEVICES:
+  for device in HERO_DEVICES:
     if device not in EXISTING_DEVICES:
       print device
 
